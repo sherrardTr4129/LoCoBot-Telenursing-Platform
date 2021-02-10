@@ -25,7 +25,7 @@
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <control_msgs/GripperCommandAction.h>
 #include <boost/thread/recursive_mutex.hpp>
-//#include <locobot_control/JointCommand.h>
+#include <locobot_control/JointCommand.h>
 #include <gazebo_msgs/ApplyJointEffort.h>
 #define NUMBER_OF_ARM_JOINTS 5
 
