@@ -20,7 +20,7 @@ def joyCallback(msg):
     returns:
         None
     """
-
+    global robot
     # extract message components
     fwdRev = msg.axes[0]
     spin = msg.axes[1]
@@ -36,17 +36,28 @@ def joyCallback(msg):
 
     # Pass command to robot base
     execution_time = 1   # 1 second per command, for now
-    robot = Robot('locobot') 
+     
     robot.base.set_vel(fwd_speed=fwdRev, 
                    turn_speed=spin, 
                    exe_time=execution_time)
 
+def main():
+    # reference interface globally
+    global robot
+    arm_config = dict(control_mode='torque')
+    # start robot control
+    try:
+
+        robot = Robot('locobot')
+        #rospy.init_node("gui_to_base_control")
+        rospy.Subscriber(joyTopic, Joy, joyCallback)
+
+    except rospy.ROSInterruptException:
+        return
+    except KeyboardInterrupt:
+        return
+    
 
 if __name__ == "__main__":
-    try:
-        rospy.init_node("gui_to_base_control")
-        rospy.Subscriber(joyTopic, Joy, joyCallback)
-    except rospy.ROSInterruptException:
-        pass
-    
+    main()
     rospy.spin()
