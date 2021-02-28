@@ -9,10 +9,13 @@ These instructions will set up your system to run a simulated LoCoBot in Gazebo 
 ### Prep your system and create a shortcut to the installation script:
 
 sudo apt update
+
 sudo apt-get install curl   (if not already installed)
+
 curl 'https://raw.githubusercontent.com/facebookresearch/pyrobot/master/robots/LoCoBot/install/locobot_install_all.sh' > locobot_install_all.sh
 
-### Make the script executable and run it.  Options: -t (type = simulator), -p (python version = 2), -l (platform = interbotix… Note for Trevor: we should verify this is correct for our hardware)
+### Make the script executable and run it.  
+### Options: -t (type = simulator), -p (python version = 2), -l (platform = interbotix… Note for Trevor: we should verify this is correct for our hardware)
 
 chmod +x locobot_install_all.sh
 ./locobot_install_all.sh -t sim_only -p 2 -l interbotix
@@ -54,8 +57,11 @@ Clone this repository.
 ### As above, start the simulation, this time without the teleop nodes:
 
 source ~/pyenv_pyrobot_python2/bin/activate (in both terminals)
+
 roslaunch telenursing_locobot_ctrl locobot_gui_control.launch 
+
 roslaunch telenursing_web_gui locobot_GUI.launch
 
 ### Run the web GUI to view LoCoBot video and control the robot:
+
 Open ~/low_cost_ws/src/LoCoBot-Telenursing-Platform/telenursing_web_gui/web/html/MainGUIPage_locobot.html
