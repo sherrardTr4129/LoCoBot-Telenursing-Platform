@@ -54,7 +54,7 @@ Clone this repository.
 ### As above, start the simulation, this time without the teleop nodes:
 
 source ~/pyenv_pyrobot_python2/bin/activate (in both terminals)
-roslaunch locobot_control main.launch use_base:=true use_arm:= true use_sim:=true 
+roslaunch telenursing_locobot_ctrl locobot_gui_control.launch 
 roslaunch telenursing_web_gui locobot_GUI.launch
 
 ### Run the web GUI to view LoCoBot video and control the robot:
