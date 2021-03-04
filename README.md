@@ -4,7 +4,7 @@ This repository contains all the developed source code and digital assets needed
 ## Pyrobot Installation and Dependencies
 This installation process was verified to complete sucessfully on Ubuntu 18.04 LTS using the python 2 option during installation, and on a machine already configured with ROS Melodic. Follow the steps below to install required dependencies for executing the software found here. 
 
-These instructions will set up your system to run a simulated LoCoBot in Gazebo only (instructions modified from https://pyrobot.org/docs/software)
+These instructions will set up your system to run a simulated LoCoBot in Gazebo only (instructions modified from https://pyrobot.org/docs/software).
 
 ### Prep your system and create a shortcut to the installation script:
 
