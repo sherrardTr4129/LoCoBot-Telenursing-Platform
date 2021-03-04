@@ -46,12 +46,15 @@ python keyboard_teleop_client.py
 sudo apt-get install ros-melodic-web-video-server
 
 pip install flask
+
 pip install Flask-Cors
 
 ### Clone and run our software:
 
 cd  ~/low_cost_ws/src
+
 Clone this repository.
+
 ./catkin_make
 
 ### As above, start the simulation, this time without the teleop nodes:
