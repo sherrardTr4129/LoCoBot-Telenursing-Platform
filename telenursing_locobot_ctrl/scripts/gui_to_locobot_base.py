@@ -49,7 +49,6 @@ def main():
     try:
 
         robot = Robot('locobot')
-        #rospy.init_node("gui_to_base_control")
         rospy.Subscriber(joyTopic, Joy, joyCallback)
 
     except rospy.ROSInterruptException:
