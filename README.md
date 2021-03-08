@@ -1,35 +1,70 @@
-# LoCoBot-Telenursing-Platform
-This repository contains all the developed source code and digital assets needed for the construction, integration, and operation of the LoCoBot Telenursing Platform. All code software seen within this repository was adapted from the software developed for the LoCoBot platform by [facebook research](https://github.com/facebookresearch/pyrobot).
+# This is the README for the LoCobot Telenursing platform
+This repository contains all the developed source code and digital assets needed for the construction, integration, and operation of the LoCoBot Telenursing Platform. Our application depends on and derives from the software developed for the LoCoBot platform by [facebook research](https://github.com/facebookresearch/pyrobot).
 
-## Installation and Dependencies
-This installation process was verified to complete sucessfully on Ubuntu 18.04 LTS using the python 2 option during installation. Follow the steps below to install required dependencies for executing the software found here. 
+## Pyrobot Installation and Dependencies
+This installation process was verified to complete sucessfully on Ubuntu 18.04 LTS using the python 2 option during installation, and on a machine already configured with ROS Melodic. Follow the steps below to install required dependencies for executing the software found here. 
 
-To get the latest install script on your machine, run the following commands in a terminal instance:
+These instructions will set up your system to run a simulated LoCoBot in Gazebo only (instructions modified from https://pyrobot.org/docs/software).
 
-```bash
-cd ~/catkin_ws_dir/src/LoCoBot-Telenursing-Platform
+### Prep your system and create a shortcut to the installation script:
+
+sudo apt update
+
+sudo apt-get install curl   (if not already installed)
+
 curl 'https://raw.githubusercontent.com/facebookresearch/pyrobot/master/robots/LoCoBot/install/locobot_install_all.sh' > locobot_install_all.sh
-```
 
-If you want to install the required software on your own machine for use within the Gazebo simulation enviornment, run the following on your local machine:
+### Make the script executable and run it.  
+### Options: -t (type = simulator), -p (python version = 2), -l (platform = interbotix… Note for Trevor: we should verify this is correct for our hardware)
 
-```bash
 chmod +x locobot_install_all.sh
 ./locobot_install_all.sh -t sim_only -p 2 -l interbotix
-```
 
-If you want to install the required software on the intel NUC onboard robot compute module, run the following within a terminal instance on the NUC. **Make sure you have the Intel RealSense camera plugged into the NUC before running the commands below.**
+## Start the LoCoBot simulation in Gazebo, and confirm successful startup by controlling the robot via teleop:
 
-```bash
-chmod +x locobot_install_all.sh
-./locobot_install_all.sh -t full -p 2 -l interbotix
-```
+### Open three terminals.  In each:
+source ~/pyenv_pyrobot_python2/bin/activate
 
-**Note:** You can change the Python version flag from 2 to 3 if need be. Please not that the ROS packages contained within this repository were written to be used with Python 2.
+### Start the simulation (terminal 1):
 
-## Usage
-Just a stub for now
+roslaunch locobot_control main.launch use_base:=true use_arm:= true use_sim:=true 
 
-## Common Issues and Their Solutions
-Just a stub for now
+### Run teleop server (terminal 2):
 
+cd ~/low_cost_ws/src/pyrobot/robots/LoCoBot/locobot_control/nodes
+python robot_teleop_server.py
+
+### Run teleop client (teminal 3):
+
+cd ~/low_cost_ws/src/pyrobot/robots/LoCoBot/locobot_control/nodes
+python keyboard_teleop_client.py
+
+## Install and run Locobot Telenursing control and application sofware
+
+### Install additional dependencies:
+
+sudo apt-get install ros-melodic-web-video-server
+
+pip install flask
+
+pip install Flask-Cors
+
+### Clone and run our software:
+
+cd  ~/low_cost_ws/src
+
+Clone this repository.
+
+./catkin_make
+
+### As above, start the simulation, this time without the teleop nodes:
+
+source ~/pyenv_pyrobot_python2/bin/activate (in both terminals)
+
+roslaunch telenursing_locobot_ctrl locobot_gui_control.launch 
+
+roslaunch telenursing_web_gui locobot_GUI.launch
+
+### Run the web GUI to view LoCoBot video and control the robot:
+
+Open ~/low_cost_ws/src/LoCoBot-Telenursing-Platform/telenursing_web_gui/web/html/MainGUIPage_locobot.html

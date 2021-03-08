@@ -1,0 +1,64 @@
+<!-- The navigation menu -->
+<head>
+  <link rel='stylesheet' type='text/css' href='../css/GUINavBar.css'>
+  <link rel='stylesheet' type='text/css' href='../css/MainPageThreeColumn.css'>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="../js/joy.js"></script>
+  <script src="../js/TaskCTRLPageReady.js"></script>
+  <script src="../js/homeRobotReq.js"></script>
+</head>
+
+<div class="navbar">
+  <a href="MainGUIPage_locobot.html">Mobile Robot Control View</a>
+  <a class="active" href="#">Task Control View</a>
+  <a href="GUIInfoPage_locobot.html">GUI Information</a>
+</div>
+
+<section class="columns">
+	<div class="column" align="center">
+		<h2>Copy of Camera View</h2>
+		<iframe id="taskPageSecondaryStream" img src="http://localhost:8080/stream_viewer?topic=/locobot/secondaryCameraStream/color/image_raw" width="650" height="500"></iframe>
+	</div>
+	<div class="column" align="center">
+                <h2>Primary Camera View</h2>
+                <iframe id="taskPagePrimaryStream" img src="http://localhost:8080/stream_viewer?topic=/locobot/primaryCameraStream/color/image_raw" width="850" height="625"></iframe>
+        </div>
+
+</section>
+
+<section class="columns">
+	<div class="column" align="center">
+		<h2>Cartesian Control (X-Y)</h2>
+		<h4>Up and down on the Joystick controls the Y-Axis position of the robot arm end-effector. Left and Right on the Joystick controls the X-Axis position of the robot arm end-effector</h4>
+		<div id="joy3" style="width:200px;height:200px;margin:30px"></div>
+	</div>
+
+	<div class="column" align="center">
+		<h2>Cartesian Control (Z)</h2>
+		<h4>Up and down on the Joystick controls the Z-Axis position of the robot arm end-effector.</h4>
+		<div id="joy4" style="width:200px;height:200px;margin:50px"></div>
+	</div>
+
+	<div class="column" align="center">
+                <h2>Pitch and Yaw Control</h2>
+		<h4>Up and down on the Joystick controls the Yaw of the robot arm end-effector. Left and Right on the Joystick controls the Pitch of the robot arm end-effector.<h4>
+                <div id="joy5" style="width:200px;height:200px;margin:50px"></div>
+        </div>
+
+
+        <div class="column" align="center">
+        	<h2>Roll Control</h2>
+		<h4>Up and down on the Joystick controls the Roll of the robot arm end-effector.</h4>
+		<div id="joy6" style="width:200px;height:200px;margin:50px"></div>
+	</div>
+</section>
+
+<section class="columns">
+	<div class="column" align="center">
+		<h2>Home Left Arm</h2>
+		<button class="block" onclick="sendHomeReq()">Home Left Arm</button>
+	</div>
+</section>
+
+<script src="../js/joyReaderTaskCTRL.js"></script>
+

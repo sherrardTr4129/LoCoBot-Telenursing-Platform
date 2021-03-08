@@ -1,0 +1,43 @@
+<!-- The navigation menu -->
+<head>
+  <link rel='stylesheet' type='text/css' href='../css/GUINavBar.css'>
+  <link rel='stylesheet' type='text/css' href='../css/MainPageThreeColumn.css'>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="../js/joy.js"></script>
+  <script src="../js/MobileCTRLPageReady.js"></script>
+</head>
+
+<div class="navbar">
+  <a class="active" href="#">Mobile Robot Control View</a>
+  <a href="TaskControlView_locobot.html">Task Control View</a>
+  <a href="GUIInfoPage_locobot.html">GUI Information</a>
+</div>
+
+<section class="columns">
+	<div class="column" align="center">
+		<h2>Copy of Camera View</h2>
+		<iframe id="mainPageSecondaryStream" img src="http://localhost:8080/stream_viewer?topic=/locobot/secondaryCameraStream/color/image_raw" width="650" height="500"></iframe>
+
+	</div>
+	<div class="column" align="center">
+		<h2>Primary Camera View</h2>
+		<iframe id="mainPagePrimaryStream" img src="http://localhost:8080/stream_viewer?topic=/locobot/primaryCameraStream/color/image_raw" width="850" height="625"></iframe>
+	</div>
+
+</section>
+
+<section class="columns">
+	<div class="column" align="center">
+		<h2>Forward/Reverse Control</h2>
+		<h4>Up on Joystick is forward, Down is Reverse</h4>
+		<div id="joy1" style="width:200px;height:200px;margin:50px"></div>
+	</div>
+
+	<div class="column" align="center">
+		<h2>Rotation Control</h2>
+		<h4>Left on Joystick will spin robot in place CCW, Right on Joystick will spin robot in place CW</h4>
+		<div id="joy2" style="width:200px;height:200px;margin:50px"></div>
+	</div>
+
+	<script src="../js/joyReaderMobile.js"></script>
+</section>

@@ -1,0 +1,3 @@
+bool home_locobot_arm
+---
+bool arm_homed
