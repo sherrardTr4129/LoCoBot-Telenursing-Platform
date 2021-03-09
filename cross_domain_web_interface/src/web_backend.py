@@ -9,6 +9,7 @@ import time
 import threading
 import copy
 import requests
+import argparse
 from json import dumps
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -337,6 +338,14 @@ def postIfChanged():
         time.sleep(DELAY)
 
 def main():
+    # set up arg parser
+    parser = argparse.ArgumentParser(description='Enter ngrok domain name for robot.')
+    parser.add_argument('-u','--url',action='store',dest='url',default=None,help='<Required> url link',required=True)
+
+    # try to get args
+    result = parser.parse_args()
+    robotHostname = result.url
+
     # start flask app as a thread
     threading.Thread(target=lambda: app.run(host="robotcontrol.live", port=5000)).start()
 
