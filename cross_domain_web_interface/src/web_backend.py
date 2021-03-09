@@ -22,13 +22,14 @@ CORS(app)
 # setup global state manager
 global FE_State
 global prev_FE_State
+global RobotURL
 FE_State = FrontEndState()
 prev_FE_State = FrontEndState()
 
 # declare URL of Robot
 robotEndpoint = "/updateRobotState"
-robotHostname = "https://5def267546f2.ngrok.io"
-RobotURL = robotHostname + robotEndpoint
+robotHostname = ""
+RobotURL = ""
 
 # declare misc. variables
 DELAY = 0.3
@@ -256,6 +257,8 @@ def makePostReq(RobotURL, FEObj):
 
     # get JSON string
     JSONStr = jsonifyObj(FEObj)
+    print(JSONStr)
+    print(RobotURL)
 
     # make request
     statusString = requests.post(RobotURL, data=JSONStr)
@@ -338,6 +341,8 @@ def postIfChanged():
         time.sleep(DELAY)
 
 def main():
+    # reference globals
+    global RobotURL
     # set up arg parser
     parser = argparse.ArgumentParser(description='Enter ngrok domain name for robot.')
     parser.add_argument('-u','--url',action='store',dest='url',default=None,help='<Required> url link',required=True)
@@ -345,6 +350,9 @@ def main():
     # try to get args
     result = parser.parse_args()
     robotHostname = result.url
+
+    # construct new robot url
+    RobotURL = robotHostname + robotEndpoint
 
     # start flask app as a thread
     threading.Thread(target=lambda: app.run(host="robotcontrol.live", port=5000)).start()
