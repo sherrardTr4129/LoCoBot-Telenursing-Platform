@@ -8,8 +8,10 @@ The front end portion of the interface is contained within the web sub-directory
 The flask backend application that communicates with the front-end application and with the robot's API can be found under the /src sub-folder in this section. The program can be run with the following command:
 
 ```bash
-python src/web_backend.py
+python3 src/web_backend.py -u <NGROK URL>
 ```
+
+Make sure to replace \<NGROK URL\> with the current ngrok url of the robot flask bridge.
 
 Note that the robot hostname is currently set to "http://localhost:12345" for testing purposes. Make sure to change this for the production demo. The backend will attempt to make a POST request to the robot URL when new user input is recieved, or when data axes are non-zero (except in the case of push buttons). 
 
