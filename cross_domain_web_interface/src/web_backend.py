@@ -26,7 +26,7 @@ prev_FE_State = FrontEndState()
 
 # declare URL of Robot
 robotEndpoint = "/updateRobotState"
-robotHostname = "http://localhost:12345"
+robotHostname = "https://5def267546f2.ngrok.io"
 RobotURL = robotHostname + robotEndpoint
 
 # declare misc. variables
@@ -338,7 +338,7 @@ def postIfChanged():
 
 def main():
     # start flask app as a thread
-    threading.Thread(target=lambda: app.run(host="0.0.0.0", port=5000)).start()
+    threading.Thread(target=lambda: app.run(host="robotcontrol.live", port=5000)).start()
 
     # start the post thread
     thread = threading.Thread(target=postIfChanged)
