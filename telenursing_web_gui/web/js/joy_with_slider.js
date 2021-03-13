@@ -53,18 +53,19 @@
  * 	externalStrokeColor {String} (optional) - External reference circonference color (Default value is '#008000')
  * 	autoReturnToCenter {Bool} (optional) - Sets the behavior of the stick, whether or not, it should return to zero position when released (Default value is True and return to zero)
  */
-var JoySlider = (function(container, parameters)
+var JoyStickSlider = (function(container, parameters)
 {
 	parameters = parameters || {};
-	var title = (typeof parameters.title === "undefined" ? "joyslider" : parameters.title),
+	var title = (typeof parameters.title === "undefined" ? "joystick" : parameters.title),
 		width = (typeof parameters.width === "undefined" ? 0 : parameters.width),
 		height = (typeof parameters.height === "undefined" ? 0 : parameters.height),
-		// internalFillColor = (typeof parameters.internalFillColor === "undefined" ? "#00AA00" : parameters.internalFillColor),
-		// internalLineWidth = (typeof parameters.internalLineWidth === "undefined" ? 2 : parameters.internalLineWidth),
-		// internalStrokeColor = (typeof parameters.internalStrokeColor === "undefined" ? "#003300" : parameters.internalStrokeColor),
+		internalFillColor = (typeof parameters.internalFillColor === "undefined" ? "#00AA00" : parameters.internalFillColor),
+		internalLineWidth = (typeof parameters.internalLineWidth === "undefined" ? 2 : parameters.internalLineWidth),
+		internalStrokeColor = (typeof parameters.internalStrokeColor === "undefined" ? "#003300" : parameters.internalStrokeColor),
 		externalLineWidth = (typeof parameters.externalLineWidth === "undefined" ? 2 : parameters.externalLineWidth),
-		externalStrokeColor = (typeof parameters.externalStrokeColor ===  "undefined" ? "#800080" : parameters.externalStrokeColor),
-		autoReturnToCenter = (typeof parameters.autoReturnToCenter === "undefined" ? true : parameters.autoReturnToCenter);
+		externalStrokeColor = (typeof parameters.externalStrokeColor ===  "undefined" ? "#008000" : parameters.externalStrokeColor),
+        sliderColor = (typeof parameters.externalStrokeColor ===  "undefined" ? "#800080" : parameters.externalStrokeColor),
+        autoReturnToCenter = (typeof parameters.autoReturnToCenter === "undefined" ? true : parameters.autoReturnToCenter);
 	
 	// Create Canvas element and add it in the Container object
 	var objContainer = document.getElementById(container);
@@ -79,20 +80,23 @@ var JoySlider = (function(container, parameters)
 	
 	var pressed = 0; // Bool - 1=Yes - 0=No
     var circumference = 2 * Math.PI;
-    // var internalRadius = (canvas.width-((canvas.width/2)+10))/2;
-	// var maxMoveStick = internalRadius + 5;
-	// var externalRadius = internalRadius + 30;
-    var externalRadius = (canvas.width-((canvas.width/2)+10))/2 + 40;
+    var internalRadius = (canvas.width-((canvas.width/2)+10))/2;
+	var maxMoveStick = internalRadius + 5;
+	var externalRadius = internalRadius + 20;
+    var sliderRadius = externalRadius + 20;
 	var centerX = canvas.width / 2;
 	var centerY = canvas.height / 2;
-	// var directionHorizontalLimitPos = canvas.width / 10;
-	// var directionHorizontalLimitNeg = directionHorizontalLimitPos * -1;
-	// var directionVerticalLimitPos = canvas.height / 10;
-	// var directionVerticalLimitNeg = directionVerticalLimitPos * -1;
-	// Used to save current position of stick
-	var movedX=centerX;
-	var movedY=centerY;
-		
+	var directionHorizontalLimitPos = canvas.width / 10;
+	var directionHorizontalLimitNeg = directionHorizontalLimitPos * -1;
+	var directionVerticalLimitPos = canvas.height / 10;
+	var directionVerticalLimitNeg = directionVerticalLimitPos * -1;
+	// Used to save current position of stick / slider
+	var movedX = centerX;
+	var movedY = centerY;
+	var smoveX = 0;
+    var smoveY = -sliderRadius;
+    var moveRadius = 0;
+
 	// Check if the device support the touch or not
 	if("ontouchstart" in document.documentElement)
 	{
@@ -108,7 +112,8 @@ var JoySlider = (function(container, parameters)
 	}
 	// Draw the object
 	drawExternal();
-	// drawInternal();
+	drawInternal();
+	drawSlideCircle();
     drawSlider();
 
 	/******************************************************
@@ -127,52 +132,59 @@ var JoySlider = (function(container, parameters)
 		context.stroke();
 	}
 
+	/**
+	 * @desc Draw the internal stick in the current position the user have moved it
+	 */
+	function drawInternal()
+	{
+		context.beginPath();
+		if(movedX<internalRadius) { movedX=maxMoveStick; }
+		if((movedX+internalRadius) > canvas.width) { movedX = canvas.width-(maxMoveStick); }
+		if(movedY<internalRadius) { movedY=maxMoveStick; }
+		if((movedY+internalRadius) > canvas.height) { movedY = canvas.height-(maxMoveStick); }
+		context.arc(movedX, movedY, internalRadius, 0, circumference, false);
+		// create radial gradient
+		var grd = context.createRadialGradient(centerX, centerY, 5, centerX, centerY, 200);
+		// Light color
+		grd.addColorStop(0, internalFillColor);
+		// Dark color
+		grd.addColorStop(1, internalStrokeColor);
+		context.fillStyle = grd;
+		context.fill();
+		context.lineWidth = internalLineWidth;
+		context.strokeStyle = internalStrokeColor;
+		context.stroke();
+	}
+
+    /**
+     * @desc Draw reference circle for slider
+     */
+	function drawSlideCircle()
+	{
+		context.beginPath();
+		context.arc(centerX, centerY, sliderRadius, 0, circumference, false);
+		context.lineWidth = externalLineWidth;
+		context.strokeStyle = sliderColor;
+		context.stroke();
+	}
+
     /**
      * @desc Draw slider grabber
      */
     function drawSlider()
     {
         context.beginPath();
-        if (movedY < 0) movedY = 0;
-        if (movedX === 0 && movedY === 0) {
-            context.arc(centerX, centerY + externalRadius, 5, circumference, false);
-        }
-        else {
-            var angle = Math.atan2(movedY,movedX)
-            var sliderX = externalRadius * Math.cos(angle);
-            var sliderY = externalRadius * Math.sin(angle);
-            context.arc(sliderX, sliderY, 5, circumference, false);
-        }
+        if (smoveY > 0) smoveY = 0;
 
-        context.lineWidght = externalLineWidth;
-        context.strokeStyle = externalStrokeColor;
+        var angle = Math.atan2(smoveY, smoveX);
+        var sliderX = sliderRadius * Math.cos(angle);
+        var sliderY = sliderRadius * Math.sin(angle);
+        context.arc(centerX + sliderX, centerY + sliderY, 5, 0, circumference, false);
+
+        context.lineWidth = externalLineWidth;
+        context.fillStyle = sliderColor;
         context.fill();
-    }
-    
-	/**
-	 * @desc Draw the internal stick in the current position the user have moved it
-	 */
-	// function drawInternal()
-	// {
-	// 	context.beginPath();
-	// 	if(movedX<internalRadius) { movedX=maxMoveStick; }
-	// 	if((movedX+internalRadius) > canvas.width) { movedX = canvas.width-(maxMoveStick); }
-	// 	if(movedY<internalRadius) { movedY=maxMoveStick; }
-	// 	if((movedY+internalRadius) > canvas.height) { movedY = canvas.height-(maxMoveStick); }
-	// 	context.arc(movedX, movedY, internalRadius, 0, circumference, false);
-	// 	// create radial gradient
-	// 	var grd = context.createRadialGradient(centerX, centerY, 5, centerX, centerY, 200);
-	// 	// Light color
-	// 	grd.addColorStop(0, internalFillColor);
-	// 	// Dark color
-	// 	grd.addColorStop(1, internalStrokeColor);
-	// 	context.fillStyle = grd;
-	// 	context.fill();
-	// 	context.lineWidth = internalLineWidth;
-	// 	context.strokeStyle = internalStrokeColor;
-	// 	context.stroke();
-	// }
-	
+    }	
 	/**
 	 * @desc Events for manage touch
 	 */
@@ -221,7 +233,7 @@ var JoySlider = (function(container, parameters)
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		// Redraw object
 		drawExternal();
-		drawSlider();
+		drawInternal();
 		//canvas.unbind('touchmove');
 	}
 
@@ -230,36 +242,52 @@ var JoySlider = (function(container, parameters)
 	 */
 	function onMouseDown(event) 
 	{
-        // movedX = event.pageX;
-        // movedY = event.pageY;
-        // if(movedX > centerX-5 && movedX < centerX+5 
-        //     && movedY > centerY + externalRadius - 5 && movedY < centerY + externalRadius + 5) {
-		//     pressed = 1;
-        //     }
-        pressed = 1;
+		pressed = 1;
 	}
 
 	function onMouseMove(event) 
 	{
 		if(pressed === 1)
 		{
-			movedX = event.pageX;
-			movedY = event.pageY;
+            tempX = event.pageX;
+            tempY = event.pageY;
 			// Manage offset
 			if(canvas.offsetParent.tagName.toUpperCase() === "BODY")
 			{
-				movedX -= canvas.offsetLeft;
-				movedY -= canvas.offsetTop;
+				tempX -= (canvas.offsetLeft + centerX);
+				tempY -= (canvas.offsetTop + centerY);
 			}
 			else
 			{
-				movedX -= canvas.offsetParent.offsetLeft;
-				movedY -= canvas.offsetParent.offsetTop;
+				tempX -= (canvas.offsetParent.offsetLeft + centerX);
+				tempY -= (canvas.offsetParent.offsetTop + centerY);
 			}
+
+            radius = Math.sqrt(tempX*tempX + tempY*tempY);
+            if(radius < externalRadius) {
+                movedX = tempX + centerX;
+                movedY = tempY + centerY;
+                smoveX = 0;
+                smoveY = -sliderRadius;
+            }
+            else if(radius < sliderRadius+5 && Math.abs(smoveX-tempX)<10 && Math.abs(smoveY-tempY)<10) {
+                smoveX = tempX;
+                smoveY = tempY;
+                movedX = centerX;
+                movedY = centerY;
+            }
+            else {
+                movedX = centerX;
+                movedY = centerY;
+                smoveX = 0;
+                smoveY = -sliderRadius;
+            }
 			// Delete canvas
 			context.clearRect(0, 0, canvas.width, canvas.height);
 			// Redraw object
 			drawExternal();
+			drawInternal();
+            drawSlideCircle();
 			drawSlider();
 		}
 	}
@@ -267,18 +295,17 @@ var JoySlider = (function(container, parameters)
 	function onMouseUp(event) 
 	{
 		pressed = 0;
-		// If required reset position store variable
-		if(autoReturnToCenter)
-		{
-			movedX = centerX;
-			movedY = centerY;
-		}
-		// Delete canvas
+        movedX = centerX;
+        movedY = centerY;
+        smoveX = 0;
+        smoveY = -sliderRadius;
+    // Delete canvas
 		context.clearRect(0, 0, canvas.width, canvas.height);
 		// Redraw object
 		drawExternal();
-		drawSlider();
-		//canvas.unbind('mousemove');
+        drawInternal();
+        drawSlideCircle();
+        drawSlider();
 	}
 
 	/******************************************************
