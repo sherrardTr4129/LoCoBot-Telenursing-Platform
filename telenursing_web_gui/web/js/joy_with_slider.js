@@ -95,6 +95,7 @@ var JoyStickSlider = (function(container, parameters)
 	var movedY = centerY;
 	var smoveX = 0;
     var smoveY = -sliderRadius;
+	var angle = 0;
     var moveRadius = 0;
 
 	// Check if the device support the touch or not
@@ -176,7 +177,7 @@ var JoyStickSlider = (function(container, parameters)
         context.beginPath();
         if (smoveY > 0) smoveY = 0;
 
-        var angle = Math.atan2(smoveY, smoveX);
+        angle = Math.atan2(smoveY, smoveX);
         var sliderX = sliderRadius * Math.cos(angle);
         var sliderY = sliderRadius * Math.sin(angle);
         context.arc(centerX + sliderX, centerY + sliderY, 5, 0, circumference, false);
@@ -366,6 +367,15 @@ var JoyStickSlider = (function(container, parameters)
 		return ((100*((movedY - centerY)/maxMoveStick))*-1).toFixed();
 	};
 	
+	/**
+	 * @desc Returns the requested angle of the slider from vertical (radians) - positive value for left turn
+	 * @return Double between -pi/2 and pi/2 
+	 */
+	this.GetAngle = function ()
+	{
+		return angle;	
+	};
+
 	/**
 	 * @desc Get the direction of the cursor as a string that indicates the cardinal points where this is oriented
 	 * @return String of cardinal point N, NE, E, SE, S, SW, W, NW and C when it is placed in the center
