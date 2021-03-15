@@ -43,6 +43,22 @@ function sendSpinData()
 	});
 }
 
+var Slider1 = new JoySlider('slider1');
+var sliderURL = "http://localhost:5000/sliderPost"
+var sliderData = {
+	"slider": 0
+}
+
+function sendSliderData()
+{
+	$.ajax({type: 'POST',
+		url: slideURL,
+		data: JSON.stringify (slideData),
+		success: function(data) {  },
+		contentType: "application/json",
+		dataType: 'json'
+	});
+}
 setInterval(function(){ spinData.spin=Joy2.GetX(); }, 50);
 setInterval(function(){ sendSpinData() }, 200);
 
