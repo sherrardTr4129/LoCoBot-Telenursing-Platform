@@ -31,9 +31,9 @@ def xyzArmCallback(msg):
     global robot
     # extract message components and normalize - joystick provides [-100,100] and 
     # we will scale to [-0.1,0.1]
-    arm_x = msg.data[0]/2000.0
-    arm_y = msg.data[1]/2000.0
-    arm_z = msg.data[2]/2000.0
+    arm_x = msg.data[0]/5000.0
+    arm_y = msg.data[1]/5000.0
+    arm_z = msg.data[2]/5000.0
 
     if (arm_x == 0 and arm_y == 0 and arm_z == 0):
         rospy.loginfo("no arm movement requested")
@@ -57,15 +57,11 @@ def twistCallback(msg):
     """
     global robot
     # extract message components and scale (need to validate scale factors - these are wags based on teleop config)
-    fwdRev = (msg.linear.x)/200
-    spin = (msg.angular.z)/100
-
-
-    # invert the direction of the scaled spin value - need to verify whether this is needed for Locobot or is Trina-specific
-    spin = -spin
+    fwdRev = (msg.linear.x)/3
+    spin = (msg.angular.z)/3
 
     # Pass command to robot base
-    execution_time = 0.5   # match with web command refresh rate
+    execution_time = 0.15   # match with web command refresh rate
      
     robot.base.set_vel(fwd_speed=fwdRev, 
                    turn_speed=spin, 
@@ -105,11 +101,11 @@ def panTiltCallback(msg):
     global robot
     cam_pose = msg.data
     if (cam_pose[0] != 0):
-        pan_sign = 1 if cam_pose[0]>0 else -1
+        pan_sign = -1 if cam_pose[0]>0 else 1
         robot.camera.set_pan(robot.camera.get_pan() + pan_sign * 0.1)
         rospy.loginfo("pan set")
     if (cam_pose[1] != 0):
-        tilt_sign = 1 if cam_pose[1]>0 else -1
+        tilt_sign = -1 if cam_pose[1]>0 else 1
         robot.camera.set_tilt(robot.camera.get_tilt() + tilt_sign * 0.1)
         rospy.loginfo("tilt set")
 
