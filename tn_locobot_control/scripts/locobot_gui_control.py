@@ -39,9 +39,20 @@ def xyzArmCallback(msg):
         rospy.loginfo("no arm movement requested")
     
     else:
+        # displacement = np.array([arm_x, arm_y, arm_z])
+        # success = robot.arm.move_ee_xyz(displacement, plan=False)
+        # rospy.loginfo("tried to move arm")
         displacement = np.array([arm_x, arm_y, arm_z])
-        success = robot.arm.move_ee_xyz(displacement, plan=False)
-        rospy.loginfo("tried to move arm")
+        t,r,q = robot.arm.pose_ee
+        translation = np.add(np.asarray(t).flatten(), displacement)
+        orientation = np.asarray(r)
+        ident = np.eye(3)
+        orientation[:,2] = ident[:,2]
+        orientation[2,:] = ident[2,:]
+        robot.arm.set_ee_pose(translation, orientation, plan=False)
+        rospy.loginfo("translation was %s", str(translation))
+        rospy.loginfo("orientation was %s", str(orientation))
+
  
 def twistCallback(msg):
     """
