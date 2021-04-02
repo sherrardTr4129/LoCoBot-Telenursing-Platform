@@ -71,6 +71,10 @@ def twistCallback(msg):
     fwdRev = (msg.linear.x)/3
     spin = (msg.angular.z)/3
 
+    # Reduce cross-coupling of commands
+    if (spin<0.1 and fwdRev>5): spin=0
+    if (fwdRev < 0.5 and spin>0.2): fwdRev=0
+
     # Pass command to robot base
     execution_time = 0.15   # match with web command refresh rate
      
@@ -125,6 +129,11 @@ def main():
     global robot
     global gripper_state
     arm_config = dict(control_mode='torque')
+    use_laser = True
+    if (use_laser):
+        modTwistTopic = "/artificial_potential/twist"
+    else:
+        modTwistTopic = namespace + twistTopic
     # start robot control
     try:
         # Home robot arm
@@ -133,7 +142,7 @@ def main():
         gripper_state = robot.gripper.get_gripper_state()
         # Initialize subscriber to respond to joystick inputs
 
-        rospy.Subscriber(namespace + twistTopic, Twist, twistCallback)
+        rospy.Subscriber(modTwistTopic, Twist, twistCallback)
         rospy.Subscriber(namespace + gripperStateTopic, Int8, gripperCallback)
         rospy.Subscriber(namespace + xyzArmOffsetTopic, Float32MultiArray, xyzArmCallback)
         rospy.Subscriber(namespace + panTiltOffsetTopic, Float32MultiArray, panTiltCallback)
