@@ -13,14 +13,14 @@ namespace = "/pyRobot_web_data/"
 twistTopic = "cmd_vel"
 xyzArmOffsetTopic = "xyz_arm_offet"
 # Laser angle and range constants 
-LA_INC = 0.00436940183863
-LA_MIN = -1.57079994678
-LA_MAX = 1.57079994678
+LA_SAMPLES = 30
+LA_MIN = -1.047198
+LA_MAX = 1.047198
 LR_MIN = 0.1
 LR_MAX = 30.0
 # Maximum obstacle distance and scale factor to use for avoidance behavior
 OBS_MAX = 1.0
-ETA = 50
+ETA = 3000
 
 pub = rospy.Publisher("/artificial_potential/twist", Twist, queue_size=1)
 
@@ -43,11 +43,11 @@ def xyzArmCallback(msg):
     arm_y = msg.data[1]/5000.0
     arm_z = msg.data[2]/5000.0
 
-    if (arm_x == 0 and arm_y == 0 and arm_z == 0):
-        rospy.loginfo("no arm command to alter")
+    # if (arm_x == 0 and arm_y == 0 and arm_z == 0):
+    #     rospy.loginfo("no arm command to alter")
     
-    else:
-        rospy.loginfo("arm workspace safety checks not written, doing nothing")
+    # else:
+    #     rospy.loginfo("arm workspace safety checks not written, doing nothing")
 
 def laserCallback(msg):
     """
@@ -78,36 +78,52 @@ def repubTwistCallback(msg):
     global laser_ranges
     fwdRev = msg.linear.x
     spin = msg.angular.z
-    linear_spin = 0.354 * spin # 354 mm Turtlebot base
-    vel_inputs = np.array([fwdRev, linear_spin])
-    for i in range(10,laser_ranges.size-10):
-        if (laser_ranges[i]<OBS_MAX): # Nearby obstacle detected
-            # if (laser_ranges[i]<laser_ranges[i-1] 
-            #     and laser_ranges[i]<laser_ranges[i+1]): # Local minimum, object CPA
-            if np.argmin(laser_ranges[i-10:i+10])==10:
-                #mag = 100/laser_ranges[i] # Use the numerator as the scaling factor for avoidance behavior (currently 10/dist)
-                mag = (ETA/2)*pow((1/laser_ranges[i] - (1/OBS_MAX)),2)
-                angle = LA_MIN + i*LA_INC
-                vel = -math.cos(angle)*mag
-                lat = -math.sin(angle)*mag
-                vel_inputs = np.append(vel_inputs,[vel,lat])
-    rospy.loginfo("vel array: %s", np.array2string(vel_inputs))
 
-    j=0
+    vel_inputs = np.array([0,0])
+    # for i in range(10,laser_ranges.size-10):  // use this for high fidelity rangefinder... lots of samples
+    #     if (laser_ranges[i]<OBS_MAX): # Nearby obstacle detected
+    #         # if (laser_ranges[i]<laser_ranges[i-1] 
+    #         #     and laser_ranges[i]<laser_ranges[i+1]): # Local minimum, object CPA
+    #         if np.argmin(laser_ranges[i-10:i+10])==10:
+    #             #mag = 100/laser_ranges[i] # Use the numerator as the scaling factor for avoidance behavior (currently 10/dist)
+    #             mag = (ETA/2)*pow((1/laser_ranges[i] - (1/OBS_MAX)),4)
+    #             angle = LA_MIN + i*2*LA_MAX/LA_SAMPLES
+    #             rospy.loginfo("detection angle %s", str(angle))
+    #             vel = -math.cos(angle)*mag
+    #             lat = -math.sin(angle)*mag/2
+    #             vel_inputs = np.append(vel_inputs,[vel,lat])
+ 
+    # For current setup (30 returns)
+    for i in range(1,laser_ranges.size-1):
+        dist = OBS_MAX if abs(i-15) < 3 else OBS_MAX*2 #adjust range sensitivity depending on direction of obstacle (arm clnc)
+        if (laser_ranges[i]<dist): # Nearby obstacle detected
+            mag = (ETA/2)*pow((1/laser_ranges[i] - (1/OBS_MAX)),2)
+            angle = LA_MIN + i*2*LA_MAX/LA_SAMPLES
+            vel = -math.cos(angle)*mag 
+            lat = -math.sin(angle)*mag 
+            if (dist != OBS_MAX): # additional sensitivity tweaks for front vs. side sensors 
+                vel = vel/10
+                lat = lat/2
+            vel_inputs = np.append(vel_inputs,[vel,lat])
+
+
+    j=2
     out_fwdrev = 0
     out_spin = 0
-    while(j<vel_inputs.size):
-        out_fwdrev += vel_inputs[j]
-        j+=1
-        out_spin += vel_inputs[j]
-        j+=1
-
-    rospy.loginfo("totals: %s, %s", out_fwdrev, out_spin)
-    rospy.loginfo("new: %s, %s", out_fwdrev/vel_inputs.size, out_spin/vel_inputs.size)
-
+    if (vel_inputs.size > 2):
+        while(j<vel_inputs.size):
+            out_fwdrev += vel_inputs[j]
+            j+=1
+            out_spin += vel_inputs[j]
+            j+=1
+   
     newmsg = Twist()
-    newmsg.linear.x = out_fwdrev/vel_inputs.size
-    newmsg.angular.z = (out_spin/vel_inputs.size)/0.354
+    if abs(fwdRev) > 10 or abs(spin) > 0.2:
+        newmsg.linear.x = fwdRev + out_fwdrev/(j-1) # add half of obstacle vector to command 
+        newmsg.angular.z = spin + (out_spin/(j-1))
+        rospy.loginfo("original: %s, %s", fwdRev, spin)
+        rospy.loginfo("new: %s, %s", newmsg.linear.x, newmsg.angular.z)
+        
     pub.publish(newmsg)
 
 

@@ -36,22 +36,26 @@ def xyzArmCallback(msg):
     arm_z = msg.data[2]/5000.0
 
     if (arm_x == 0 and arm_y == 0 and arm_z == 0):
-        rospy.loginfo("no arm movement requested")
-    
+        #rospy.loginfo("no arm movement requested")
+        i=0 #placeholder
+
     else:
         # displacement = np.array([arm_x, arm_y, arm_z])
         # success = robot.arm.move_ee_xyz(displacement, plan=False)
         # rospy.loginfo("tried to move arm")
         displacement = np.array([arm_x, arm_y, arm_z])
         t,r,q = robot.arm.pose_ee
-        translation = np.add(np.asarray(t).flatten(), displacement)
-        orientation = np.asarray(r)
-        ident = np.eye(3)
-        orientation[:,2] = ident[:,2]
-        orientation[2,:] = ident[2,:]
-        robot.arm.set_ee_pose(translation, orientation, plan=False)
-        rospy.loginfo("translation was %s", str(translation))
-        rospy.loginfo("orientation was %s", str(orientation))
+        if (t[2]<0.1):
+            rospy.loginfo("arm too low, safety protocol activated with z=%s",str(t[2]))
+        else:
+            translation = np.add(np.asarray(t).flatten(), displacement)
+            orientation = np.asarray(r)
+            ident = np.eye(3)
+            orientation[:,2] = ident[:,2]
+            orientation[2,:] = ident[2,:]
+            robot.arm.set_ee_pose(translation, orientation, plan=False)
+            rospy.loginfo("translation was %s", str(translation))
+            rospy.loginfo("orientation was %s", str(orientation))
 
  
 def twistCallback(msg):
@@ -69,11 +73,11 @@ def twistCallback(msg):
     global robot
     # extract message components and scale (need to validate scale factors - these are wags based on teleop config)
     fwdRev = (msg.linear.x)/3
-    spin = (msg.angular.z)/3
+    spin = (msg.angular.z)/30
 
     # Reduce cross-coupling of commands
-    if (spin<0.1 and fwdRev>5): spin=0
-    if (fwdRev < 0.5 and spin>0.2): fwdRev=0
+    if (spin<0.1 and (fwdRev>5 or fwdRev < -5)): spin=0
+    if ((fwdRev < 5 and fwdRev > -5) and spin>0.2): fwdRev=0
 
     # Pass command to robot base
     execution_time = 0.15   # match with web command refresh rate
@@ -93,7 +97,7 @@ def gripperCallback(msg):
     """
     global robot
     global gripper_state
-    rospy.loginfo("In gripper callback with req: %s", str(msg.data))
+    #rospy.loginfo("In gripper callback with req: %s", str(msg.data))
     if (msg.data==1 and gripper_state != 0):
         robot.gripper.open(wait=True)
         gripper_state = robot.gripper.get_gripper_state()

@@ -7,17 +7,29 @@
     <arg name="use_sim" default="true"/>
     <arg name="use_camera" default="true"/>
     <arg name="world_name" default="$(find tn_locobot_control)/worlds/hospital.world"/>
+    <arg name="use_laser" default="true"/>
 
-    <include file="$(find tn_locobot_control)/launch/main.launch">
-        <arg name="use_base" value="$(arg use_base)"/>
-        <arg name="use_arm" value="$(arg use_arm)"/>
-        <arg name="use_sim" value="$(arg use_sim)"/>
-        <arg name="use_camera" value="$(arg use_camera)"/>
-        <arg name="world_name" value="$(arg world_name)"/>
-    </include>
+    <group if="$(arg use_laser)" >
+        <include file="$(find tn_locobot_control)/launch/main.launch">
+            <arg name="use_base" value="$(arg use_base)"/>
+            <arg name="use_arm" value="$(arg use_arm)"/>
+            <arg name="use_sim" value="$(arg use_sim)"/>
+            <arg name="use_camera" value="$(arg use_camera)"/>
+            <arg name="world_name" value="$(arg world_name)"/>
+        </include>
+    </group>
 
+    <group unless="$(arg use_laser)">
+        <include file="$(find locobot_control)/launch/main.launch">
+            <arg name="use_base" value="$(arg use_base)"/>
+            <arg name="use_arm" value="$(arg use_arm)"/>
+            <arg name="use_sim" value="$(arg use_sim)"/>
+            <arg name="use_camera" value="$(arg use_camera)"/>
+            <arg name="world_name" value="$(arg world_name)"/>
+        </include>
+    </group>
     <node name="video_server" pkg="web_video_server" type="web_video_server" />
     <node name="ros_to_flask_bridge" pkg="flask_bridge" type="ros_flask_bridge.py" />
-    <node name="locobot_gui_ctrl" pkg="tn_locobot_control" type="locobot_gui_control.py" output="screen"/>
+
 
 </launch>
