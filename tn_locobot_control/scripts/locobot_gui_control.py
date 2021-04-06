@@ -76,8 +76,8 @@ def twistCallback(msg):
     spin = (msg.angular.z)/30
 
     # Reduce cross-coupling of commands
-    if (spin<0.1 and (fwdRev>5 or fwdRev < -5)): spin=0
-    if ((fwdRev < 5 and fwdRev > -5) and spin>0.2): fwdRev=0
+    if (abs(spin)<5 and abs(fwdRev)>20): spin=0
+    if (abs(fwdRev) < 5 and abs(spin)>20): fwdRev=0
 
     # Pass command to robot base
     execution_time = 0.15   # match with web command refresh rate

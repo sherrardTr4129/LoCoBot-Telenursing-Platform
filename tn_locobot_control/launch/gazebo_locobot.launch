@@ -1,6 +1,7 @@
 <launch>  
   <arg name="base"/>
   <arg name="world_name" default="$(find locobot_gazebo)/worlds/ground.world"/>
+  <arg name="use_laser" default="true"/>
   <!-- Static transform to make camera work in sim -->
   <node pkg="tf" type="static_transform_publisher" name="cam_transform" args="0 0 0 0 0 0 /camera_link /camera_color_optical_frame 100" />
 
@@ -33,10 +34,16 @@
     <include file="$(find locobot_moveit_config)/launch/planning_context.launch">
       <arg name="load_robot_description" value="true"/>
     </include>
-
-    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
+    <group if="$(eval use_laser == 'true')">
+      <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
           args="-file $(find tn_locobot_description)/urdf/locobot_with_hokuyu_description.urdf -urdf -z 0.05 -model locobot" >
-    </node>
+      </node>
+    </group>
+    <group unless="$(eval use_laser == 'true')">
+      <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
+          args="-file $(find locobot_description)/urdf/locobot_description.urdf -urdf -z 0.05 -model locobot" >
+      </node>   
+    </group> 
 
     <!-- Velocity muxer -->
     <node pkg="nodelet" type="nodelet" name="mobile_base_nodelet_manager" args="manager"/>

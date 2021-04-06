@@ -9,7 +9,8 @@
     <arg name="use_rviz" default="true"/>
     <arg name="base" default="kobuki"/> <!-- Options: create and kobuki -->
     <arg name="world_name" default="$(find locobot_gazebo)/worlds/ground.world"/>
-    
+    <arg name="use_laser" default="true"/>
+
     <param name="use_camera" value="$(arg use_camera)"/>
     <param name="use_arm" value="$(arg use_arm)"/>
     <param name="use_vslam" value="$(arg use_vslam)"/>
@@ -65,10 +66,11 @@
 
     <!-- Gazebo -->
     <group if="$(arg use_sim)">
-        
+ 
         <include file="$(find tn_locobot_control)/launch/gazebo_locobot.launch">
             <arg name="base" value="$(arg base)"/>
             <arg name="world_name" value="$(arg world_name)"/>
+            <arg name="use_laser" value="$(arg use_laser)"/>
         </include>
 
         <include file="$(find locobot_gazebo)/launch/gazebo_locobot_control.launch"/>
