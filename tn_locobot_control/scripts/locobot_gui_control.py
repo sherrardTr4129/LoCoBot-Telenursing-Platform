@@ -2,6 +2,7 @@
 import rospy
 from pyrobot import Robot
 import time
+import sys
 import numpy as np
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32MultiArray, Int8
@@ -128,13 +129,13 @@ def panTiltCallback(msg):
         robot.camera.set_tilt(robot.camera.get_tilt() + tilt_sign * 0.1)
         rospy.loginfo("tilt set")
 
-def main():
+def main(laser):
     # reference interface globally
     global robot
     global gripper_state
     arm_config = dict(control_mode='torque')
-    use_laser = True
-    if (use_laser):
+
+    if (laser == "true"):
         modTwistTopic = "/artificial_potential/twist"
     else:
         modTwistTopic = namespace + twistTopic
@@ -158,5 +159,9 @@ def main():
         return
 
 if __name__ == "__main__":
-    main()
-    rospy.spin()
+    if len(sys.argv) < 2:
+        print("include use_laser argument")
+    else:
+        main(sys.argv[1])
+        rospy.spin()
+
