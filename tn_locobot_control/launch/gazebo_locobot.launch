@@ -34,12 +34,12 @@
     <include file="$(find locobot_moveit_config)/launch/planning_context.launch">
       <arg name="load_robot_description" value="true"/>
     </include>
-    <group if="$(eval use_laser == 'true')">
+    <group if="$(eval use_laser)">
       <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
           args="-file $(find tn_locobot_description)/urdf/locobot_with_hokuyu_description.urdf -urdf -z 0.05 -model locobot" >
       </node>
     </group>
-    <group unless="$(eval use_laser == 'true')">
+    <group unless="$(eval use_laser)">
       <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model"
           args="-file $(find locobot_description)/urdf/locobot_description.urdf -urdf -z 0.05 -model locobot" >
       </node>   

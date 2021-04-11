@@ -2,19 +2,25 @@
     needed to control a locobot (Gazebo simulation) from a remote web interface -->
 
 <launch>
+    <env name="GAZEBO_MODEL_PATH" value="$(find tn_locobot_gazebo)/models:${GAZEBO_MODEL_PATH}" />
+
     <arg name="use_base" default="true"/>
     <arg name="use_arm" default="true"/>
     <arg name="use_sim" default="true"/>
+    <arg name="use_rviz" default="true"/>
     <arg name="use_camera" default="true"/>
-    <arg name="use_laser" default="false"/>
-    <arg name="world_name" default="$(find tn_locobot_control)/worlds/hospital.world"/>
+    <arg name="use_laser" default="true"/>
+
+    <arg name="world_name" default="hospital"/>
+    <arg name="world_file" default="$(find tn_locobot_gazebo)/worlds/$(arg world_name).world"/>
 
     <include file="$(find tn_locobot_control)/launch/main.launch">
         <arg name="use_base" value="$(arg use_base)"/>
         <arg name="use_arm" value="$(arg use_arm)"/>
         <arg name="use_sim" value="$(arg use_sim)"/>
+        <arg name="use_rviz" value="$(arg use_rviz)"/>
         <arg name="use_camera" value="$(arg use_camera)"/>
-        <arg name="world_name" value="$(arg world_name)"/>
+        <arg name="world_name" value="$(arg world_file)"/>
         <arg name="use_laser" value="$(arg use_laser)"/>
     </include>
 

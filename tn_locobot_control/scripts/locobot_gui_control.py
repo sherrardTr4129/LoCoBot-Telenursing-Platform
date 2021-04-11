@@ -77,8 +77,8 @@ def twistCallback(msg):
     spin = (msg.angular.z)/30
 
     # Reduce cross-coupling of commands
-    if (abs(spin)<0.2 and abs(fwdRev)>20): spin=0
-    if (abs(fwdRev) < 5 and abs(spin)>1): fwdRev=0
+    if (abs(spin)<1 and abs(fwdRev)>20): spin=0
+    if (abs(fwdRev) < 5 and abs(spin)>5): fwdRev=0
 
     # Pass command to robot base
     execution_time = 0.15   # match with web command refresh rate
@@ -159,9 +159,10 @@ def main(laser):
         return
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
+    args = rospy.myargv(argv=sys.argv)
+    if len(args) < 2:
         print("include use_laser argument")
     else:
-        main(sys.argv[1])
+        main(args[1])
         rospy.spin()
 
