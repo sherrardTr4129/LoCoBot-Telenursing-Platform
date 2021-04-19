@@ -54,6 +54,9 @@ def setFwdRev():
     fwdRevDict = request.get_json()
     fwdRevData = float(fwdRevDict['fwdRev'])
 
+    # scale data
+    fwdRevData = fwdRevData / 150
+
     # update the data in FE_State
     FE_State.set_fwd_rev(fwdRevData)
     
@@ -77,6 +80,9 @@ def setSpin():
     # extract data
     spinDataDict = request.get_json()
     spinData = float(spinDataDict['spin'])
+
+    # scale data
+    spinData = -spinData / 150
 
     # update the data in FE_State
     FE_State.set_spin(spinData)
