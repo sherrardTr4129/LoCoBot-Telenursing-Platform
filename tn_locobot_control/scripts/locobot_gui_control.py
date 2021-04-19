@@ -76,7 +76,7 @@ def twistCallback(msg):
     if (fwdRev < 0.5 and spin>0.2): fwdRev=0
 
     # Pass command to robot base
-    execution_time = 0.15   # match with web command refresh rate
+    execution_time = 0.005   # match with web command refresh rate
      
     robot.base.set_vel(fwd_speed=fwdRev, 
                    turn_speed=spin, 
