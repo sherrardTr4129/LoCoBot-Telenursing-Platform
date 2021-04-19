@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<!--
+ The MIT License (MIT)
+
+ This file is part of the JoyStick Project (https://github.com/bobboteck/JoyStick).
+ Copyright (c) 2015 Roberto D'Amico (Bobboteck), Trevor Sherrard (SherrardTr4129)
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights
+ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+ 
+ The above copyright notice and this permission notice shall be included in all
+ copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ SOFTWARE.
+-->
+<html>
+	<head>
+		<title>Joy</title>
+		<meta charset="utf-8">
+		<style>
+*
+{
+	box-sizing: border-box;
+}
+body
+{
+	margin: 0px;
+	padding: 0px;
+	font-family: monospace;
+}
+.row
+{
+	display: inline-flex;
+	clear: both;
+}
+.columnLateral
+{
+  float: left;
+  width: 15%;
+  min-width: 300px;
+}
+.columnCetral
+{
+  float: left;
+  width: 70%;
+  min-width: 300px;
+}
+
+.columns {
+	display: flex;
+	flex-flow: row wrap;
+	justify-content: center;
+	margin: 5px 0;
+}
+.column {
+	flex: 1;
+	border: 1px solid gray;
+	margin: 2px;
+	padding: 30px;
+	&:first-child { margin-left: 0; }
+	&:last-child { margin-right: 0; }
+}
+.block {
+  	display: block;
+  	width: 100%;
+  	border: none;
+  	background-color: #4CAF50;
+  	color: white;
+  	padding: 14px 28px;
+  	font-size: 16px;
+  	cursor: pointer;
+  	text-align: center;
+}
+.block:hover {
+  	background-color: #ddd;
+  	color: black;
+}
+	
+
+		</style>
+		<script src="../js/joy.js"></script>
+		<script src="./js/button.js"></script>
+		<script src="./js/panTiltButton.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		</head>
+	<body>
+		<section class="columns">
+			<div class="column" align="center">
+				<div id="joy1" style="width:200px;height:200px;margin:30px">
+					<h2>Vertical: Out-In Arm</h2>
+					<h2>Horizontal: Right-Left Arm</h2>
+				</div>
+		        </div>
+                        <div class="column" align="center">
+                                <div id="joy2" style="width:200px;height:200px;margin:50px">
+					<h2>Vertical:</h2>
+					<h2>Up-Down Arm </h2>
+                                </div>
+                        </div>
+			<div class="column" align="center">
+                                <div id="joy3" style="width:200px;height:200px;margin:30px">
+                                        <h2>Vertical: Fwd-Rev Base </h2>
+                                        <h2>Horizontal: Turn Base</h2>
+                                </div>
+                        </div>
+			<div class="column" align="center">
+                                <div id="buttons" style="width:200px;height:200px;margin:50px">
+					<h2>Gripper Controls</h2>
+                                	<button class="block" onclick="openFunction()">Open Gripper</button>
+					<h2></h2>
+					<button class="block" onclick="closeFunction()">Close Gripper</button>
+				</div>
+                        </div>
+			<div class="column" align="center">
+                                <div id="buttons" style="width:200px;height:200px;margin:50px">
+                                        <h2>Pan Controls</h2>
+                                        <button class="block" onclick="posPanFunction()">Increase Pan</button>
+                                        <h2></h2>
+                                        <button class="block" onclick="negPanFunction()">Decrease Pan</button>
+                                </div>
+                        </div>
+			<div class="column" align="center">
+                                <div id="buttons" style="width:200px;height:200px;margin:50px">
+                                        <h2>Tilt Controls</h2>
+                                        <button class="block" onclick="posTiltFunction()">Increase Tilt</button>
+                                        <h2></h2>
+                                        <button class="block" onclick="negTiltFunction()">Decrease Tilt</button>
+                                </div>
+                        </div>
+		</section>
+
+		<section class="columns">
+                        <div class="column" align="center">
+                                <iframe img src="http://cdb669a0b759.ngrok.io/stream_viewer?topic=/camera/color/image_raw" id="stream" width="665" height="505"></iframe>
+                        </div>
+                </section>
+
+		<section class="columns">
+                        <div class="column" align="center">
+                        	<input type="text" id="URLinput" />
+    				<input type="button" onclick="getURLVal()" value="Set Video URL" />
+				<script>
+					function getURLVal(){
+						var URLStringParams = "stream_viewer?topic=/camera/color/image_raw";
+						var URLStr = document.getElementById('URLinput').value;
+						var totalString = URLStr + URLStringParams;
+						document.getElementById('stream').src = totalString;
+						console.log(totalString);
+					}
+				</script>
+			</div>
+                </section>
+
+		<script src="../js/joyReader.js"></script>
+	</body>
+</html>
