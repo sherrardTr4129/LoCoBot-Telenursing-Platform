@@ -5,8 +5,8 @@
  */
 
 var Joy1 = new JoyStick('joy1');
-var xURL = "http://localhost:5000/setArmOffsetX";
-var yURL = "http://localhost:5000/setArmOffsetY";
+var xURL = "http://robotcontrol.live:5000/setArmOffsetX";
+var yURL = "http://robotcontrol.live:5000/setArmOffsetY";
 
 var xData = {
 	"xArmOffset": 0
@@ -38,14 +38,14 @@ function sendYData()
 }
 
 
-setInterval(function(){ xData.xArmOffset=Joy1.GetX(); }, 100);
-setInterval(function(){ yData.yArmOffset=Joy1.GetY(); }, 100);
-setInterval(function(){ sendXData() }, 200);
-setInterval(function(){ sendYData() }, 200);
+setInterval(function(){ xData.xArmOffset=Joy1.GetY(); }, 300);
+setInterval(function(){ yData.yArmOffset=Joy1.GetX(); }, 300);
+setInterval(function(){ sendXData() }, 500);
+setInterval(function(){ sendYData() }, 500);
 
 
 var Joy2 = new JoyStick('joy2');
-var zURL = "http://localhost:5000/setArmOffsetZ"
+var zURL = "http://robotcontrol.live:5000/setArmOffsetZ"
 var zData = {
 	"zArmOffset": 0
 }
@@ -61,12 +61,12 @@ function sendZData()
 	});
 }
 
-setInterval(function(){ zData.zArmOffset=Joy2.GetY(); }, 100);
-setInterval(function(){ sendZData() }, 200);
+setInterval(function(){ zData.zArmOffset=Joy2.GetY(); }, 300);
+setInterval(function(){ sendZData() }, 500);
 
 var Joy3 = new JoyStick('joy3');
-var fwdRevURL = "http://localhost:5000/setFwdRev";
-var spinURL = "http://localhost:5000/setSpin";
+var fwdRevURL = "http://robotcontrol.live:5000/setFwdRev";
+var spinURL = "http://robotcontrol.live:5000/setSpin";
 var fwdRevData = {
         "fwdRev": 0
 }
@@ -97,10 +97,10 @@ function sendSpinData()
         });
 }
 
-setInterval(function(){ spinData.spin = Joy3.GetX(); }, 100);
-setInterval(function(){ fwdRevData.fwdRev = Joy3.GetY(); }, 100);
-setInterval(function(){ sendFwdRevData() }, 200);
-setInterval(function(){ sendSpinData() }, 200);
+setInterval(function(){ spinData.spin = Joy3.GetX(); }, 300);
+setInterval(function(){ fwdRevData.fwdRev = Joy3.GetY(); }, 300);
+setInterval(function(){ sendFwdRevData() }, 500);
+setInterval(function(){ sendSpinData() }, 500);
 
 
 
