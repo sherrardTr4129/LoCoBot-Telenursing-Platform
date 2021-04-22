@@ -91,6 +91,7 @@ body
 		<script src="../js/joy.js"></script>
 		<script src="./js/button.js"></script>
 		<script src="./js/panTiltButton.js"></script>
+		<script src="./js/homeButtons.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		</head>
 	<body>
@@ -147,18 +148,11 @@ body
 
 		<section class="columns">
                         <div class="column" align="center">
-                        	<input type="text" id="URLinput" />
-    				<input type="button" onclick="getURLVal()" value="Set Video URL" />
-				<script>
-					function getURLVal(){
-						var URLStringParams = "stream_viewer?topic=/camera/color/image_raw";
-						var URLStr = document.getElementById('URLinput').value;
-						var totalString = URLStr + URLStringParams;
-						document.getElementById('stream').src = totalString;
-						console.log(totalString);
-					}
-				</script>
-			</div>
+				<button class="block" onclick="homeArmFunction()">Home Arm</button>
+				<h2></h2>
+				<button class="block" onclick="homeCameraFunction()">Home Camera</button>
+				<h2></h2>
+                        </div>
                 </section>
 
 		<script src="../js/joyReader.js"></script>
