@@ -20,7 +20,7 @@ class FrontEndState:
                 self.tiltOffset == other.tiltOffset and self.gripperState == other.gripperState)
 
     def __iter__(self):
-        for field, val in self.__dict__.iteritems():
+        for field, val in self.__dict__.items():
             yield field, val
     
     def set_fwd_rev(self, val):
