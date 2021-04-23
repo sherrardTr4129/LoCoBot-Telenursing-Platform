@@ -287,6 +287,7 @@ def homeArmCallback():
     returns:
         None
     """
+    global robotHostname
     # make url
     homeArmURL = robotHostname + homeArmEndpoint
 
@@ -304,6 +305,7 @@ def homeCameraCallback():
     returns:
         None
     """
+    global robotHostname
     # make url
     homeCameraURL = robotHostname + homeCameraEndpoint
 
@@ -385,6 +387,7 @@ def postIfChanged():
 def main():
     # reference globals
     global RobotURL
+    global robotHostname
     # set up arg parser
     parser = argparse.ArgumentParser(description='Enter ngrok domain name for robot.')
     parser.add_argument('-u','--url',action='store',dest='url',default=None,help='<Required> url link',required=True)
