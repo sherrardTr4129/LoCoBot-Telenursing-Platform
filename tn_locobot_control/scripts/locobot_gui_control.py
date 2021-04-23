@@ -5,6 +5,8 @@ import time
 import numpy as np
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32MultiArray, Int8
+from tn_locobot_control.srv import homeCamera, homeCameraResponse
+from tn_locobot_control.srv import homeArm, homeArmResponse
 
 # define misc variables
 namespace = "/pyRobot_web_data/"
@@ -12,7 +14,43 @@ twistTopic = "cmd_vel"
 gripperStateTopic = "gripper_state"
 panTiltOffsetTopic = "pan_tilt_offset"
 xyzArmOffsetTopic = "xyz_arm_offet"
+homeCameraServiceName = "homeCameraSrv"
+homeArmServiceName = "homeArmSrv"
 
+def homeArmService(req):
+    """
+    This function serves as the service callback to home the robot arm
+
+    params:
+        req (homeArm instance): the homeArm request
+    returns:
+        response (homeArmResponse instance): the service result
+    """
+    global robot
+
+    # home the arm
+    robot.arm.go_home()
+
+    # return status
+    return homeArmResponse(True)
+
+def homeCameraService(req):
+    """
+    This function serves as the service callback to home the camera pan-tilt base
+
+    params:
+        req (homeCamera instance): the homeCamera request
+    returns:
+        response (homeCameraResponds instance): the service result
+    """
+
+    global robot
+
+    # home the camera
+    bot.camera.reset()
+
+    # return status
+    return homeCameraResponse(True)
 
 def xyzArmCallback(msg):
     """
@@ -140,8 +178,12 @@ def main():
         robot = Robot('locobot', arm_config=arm_config)
         robot.arm.go_home()
         gripper_state = robot.gripper.get_gripper_state()
-        # Initialize subscriber to respond to joystick inputs
 
+        # initialize services
+        homeCameraServ = rospy.Service(homeCameraServiceName, homeCamera, homeCameraService)
+        homeArmServ = rospy.Service(homeArmServiceName, homeArm, homeArmService)
+
+        # Initialize subscriber to respond to joystick inputs
         rospy.Subscriber(modTwistTopic, Twist, twistCallback)
         rospy.Subscriber(namespace + gripperStateTopic, Int8, gripperCallback)
         rospy.Subscriber(namespace + xyzArmOffsetTopic, Float32MultiArray, xyzArmCallback)
