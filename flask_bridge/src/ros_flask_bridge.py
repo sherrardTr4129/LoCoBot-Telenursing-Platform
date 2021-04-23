@@ -13,6 +13,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32MultiArray, Int8
+from tn_locobot_control.srv import homeCamera, homeCameraResponse
+from tn_locobot_control.srv import homeArm, homeArmResponse
 
 # initialize flask
 app = Flask(__name__)
@@ -30,6 +32,50 @@ twistTopic = "cmd_vel"
 gripperStateTopic = "gripper_state"
 panTiltOffsetTopic = "pan_tilt_offset"
 xyzArmOffsetRopic = "xyz_arm_offet"
+homeCameraServiceName = "homeCameraSrv"
+homeArmServiceName = "homeArmSrv"
+
+@app.route('/homeCamera', methods=['GET'])
+def homeCameraCB():
+    """
+    This function serves as a designated ROS bridge endpoint 
+    that is used to home the camera to the default location
+
+    params:
+        None
+    returns:
+        None
+    """
+    # wait for service to come up
+    rospy.wait_for_service(homeCameraServiceName)
+
+    # make service call
+    try:
+        serv_client = rospy.ServiceProxy(homeCameraServiceName, homeCamera)
+        resp = serv_client(True)
+    except rospy.ServiceException as error:
+        rospy.logerr("home camera service call failed: %s" % error)
+
+@app.route('/homeArm', methods=['GET'])
+def homeArmCB():
+    """
+    This function serves as a designated ROS bridge endpoint
+    that is used to home the arm to the default configuration.
+
+    params:
+        None
+    returns:
+        None
+    """
+    # wait for service to come up
+    rospy.wait_for_service(homeArmServiceName)
+    
+    # make service call
+    try:
+        serv_client = rospy.ServiceProxy(homeArmServiceName, homeArm)
+        resp = serv_client(True)
+    except rospy.ServiceException as error:
+        rospy.logerr("home arm service call failed: %s" % error)
 
 @app.route('/updateRobotState', methods=['POST'])
 def updateRobotStateCB():
