@@ -1,24 +1,18 @@
 function homeArmFunction(){
         homeArmURL = "http://robotcontrol.live:5000/homeArm"
 	homeArmData = {"homeArmData": 1};
-	$.ajax({type: 'POST',
+	$.ajax({type: 'GET',
 		url: homeArmURL,
-		data: JSON.stringify (homeArmData),
-		success: function(data) {  },
-		contentType: "application/json",
-		dataType: 'json'
+		success: function(res) { console.log(res); }
 	});
 }
 
 function homeCameraFunction(){
 	homeCameraURL = "http://robotcontrol.live:5000/homeCamera"
         homeCameraData = {"homeCameraData": 1};
-        $.ajax({type: 'POST',
+        $.ajax({type: 'GET',
                 url: homeCameraURL,
-                data: JSON.stringify (homeCameraURL),
-                success: function(data) {  },
-                contentType: "application/json",
-                dataType: 'json'
+                success: function(res) { console.log(res); }
         });
 }
 
