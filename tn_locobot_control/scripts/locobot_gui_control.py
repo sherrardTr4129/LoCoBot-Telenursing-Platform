@@ -47,7 +47,7 @@ def homeCameraService(req):
     global robot
 
     # home the camera
-    bot.camera.reset()
+    robot.camera.reset()
 
     # return status
     return homeCameraResponse(True)
@@ -167,7 +167,7 @@ def main():
     global robot
     global gripper_state
     arm_config = dict(control_mode='torque')
-    use_laser = True
+    use_laser = False
     if (use_laser):
         modTwistTopic = "/artificial_potential/twist"
     else:
