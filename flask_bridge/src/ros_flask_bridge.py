@@ -56,6 +56,8 @@ def homeCameraCB():
     except rospy.ServiceException as error:
         rospy.logerr("home camera service call failed: %s" % error)
 
+    return "OK"
+
 @app.route('/homeArm', methods=['GET'])
 def homeArmCB():
     """
@@ -76,6 +78,8 @@ def homeArmCB():
         resp = serv_client(True)
     except rospy.ServiceException as error:
         rospy.logerr("home arm service call failed: %s" % error)
+
+    return "OK"
 
 @app.route('/updateRobotState', methods=['POST'])
 def updateRobotStateCB():
