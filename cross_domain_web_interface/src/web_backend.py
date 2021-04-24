@@ -294,6 +294,8 @@ def homeArmCallback():
     # make GET request to robot
     statusString = requests.get(homeArmURL)
 
+    return "OK"
+
 @app.route('/homeCamera', methods=['GET'])
 def homeCameraCallback():
     """
@@ -311,6 +313,8 @@ def homeCameraCallback():
 
     # make GET request to robot
     statusString = requests.get(homeCameraURL)
+
+    return "OK"
 
 def allZero(FEObj):
     """
