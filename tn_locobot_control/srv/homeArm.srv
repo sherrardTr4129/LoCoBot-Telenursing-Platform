@@ -1,0 +1,3 @@
+bool homeArm
+---
+bool armHomed

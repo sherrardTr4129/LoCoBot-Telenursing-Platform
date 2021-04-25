@@ -5,6 +5,8 @@ import time
 import numpy as np
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32MultiArray, Int8
+from tn_locobot_control.srv import homeCamera, homeCameraResponse
+from tn_locobot_control.srv import homeArm, homeArmResponse
 
 # define misc variables
 namespace = "/pyRobot_web_data/"
@@ -12,7 +14,56 @@ twistTopic = "cmd_vel"
 gripperStateTopic = "gripper_state"
 panTiltOffsetTopic = "pan_tilt_offset"
 xyzArmOffsetTopic = "xyz_arm_offet"
+homeCameraServiceName = "homeCameraSrv"
+homeArmServiceName = "homeArmSrv"
 
+# define scaling constants
+# ------------------------
+# NOTE: arm data scaling of 5000 seems to work well for gazebo and physical robot
+ARM_DATA_SCALING = 5000.0
+# NOTE: fwd_rev data scaling of 3 seems to work well for gazbeo and physical robot
+FWD_REV_SCALING = 3
+# NOTE: spin data scaling of 3 seems to work well for gazebo, while a
+# 	value of 1 works well for physical robot
+SPIN_SCALING = 1
+# NOTE: an execution time of 0.015 seems to work well for the physical robot, while a
+#	value of 0.00015 seems to work best for the robot in a gazebo env.
+EXECUTION_TIME = 0.015
+
+def homeArmService(req):
+    """
+    This function serves as the service callback to home the robot arm
+
+    params:
+        req (homeArm instance): the homeArm request
+    returns:
+        response (homeArmResponse instance): the service result
+    """
+    global robot
+
+    # home the arm
+    robot.arm.go_home()
+
+    # return status
+    return homeArmResponse(True)
+
+def homeCameraService(req):
+    """
+    This function serves as the service callback to home the camera pan-tilt base
+
+    params:
+        req (homeCamera instance): the homeCamera request
+    returns:
+        response (homeCameraResponds instance): the service result
+    """
+
+    global robot
+
+    # home the camera
+    robot.camera.reset()
+
+    # return status
+    return homeCameraResponse(True)
 
 def xyzArmCallback(msg):
     """
@@ -31,9 +82,9 @@ def xyzArmCallback(msg):
     global robot
     # extract message components and normalize - joystick provides [-100,100] and 
     # we will scale to [-0.1,0.1]
-    arm_x = msg.data[0]/5000.0
-    arm_y = msg.data[1]/5000.0
-    arm_z = msg.data[2]/5000.0
+    arm_x = msg.data[0]/ARM_DATA_SCALING
+    arm_y = msg.data[1]/ARM_DATA_SCALING
+    arm_z = msg.data[2]/ARM_DATA_SCALING
 
     if (arm_x == 0 and arm_y == 0 and arm_z == 0):
         rospy.loginfo("no arm movement requested")
@@ -67,16 +118,16 @@ def twistCallback(msg):
         None
     """
     global robot
-    # extract message components and scale (need to validate scale factors - these are wags based on teleop config)
-    fwdRev = (msg.linear.x)/3
-    spin = (msg.angular.z)/3
+    # extract message components and scale
+    fwdRev = (msg.linear.x)/FWD_REV_SCALING
+    spin = (msg.angular.z)/SPIN_SCALING
 
     # Reduce cross-coupling of commands
     if (spin<0.1 and fwdRev>5): spin=0
     if (fwdRev < 0.5 and spin>0.2): fwdRev=0
 
     # Pass command to robot base
-    execution_time = 0.005   # match with web command refresh rate
+    execution_time = EXECUTION_TIME
      
     robot.base.set_vel(fwd_speed=fwdRev, 
                    turn_speed=spin, 
@@ -129,7 +180,7 @@ def main():
     global robot
     global gripper_state
     arm_config = dict(control_mode='torque')
-    use_laser = True
+    use_laser = False
     if (use_laser):
         modTwistTopic = "/artificial_potential/twist"
     else:
@@ -140,8 +191,12 @@ def main():
         robot = Robot('locobot', arm_config=arm_config)
         robot.arm.go_home()
         gripper_state = robot.gripper.get_gripper_state()
-        # Initialize subscriber to respond to joystick inputs
 
+        # initialize services
+        homeCameraServ = rospy.Service(homeCameraServiceName, homeCamera, homeCameraService)
+        homeArmServ = rospy.Service(homeArmServiceName, homeArm, homeArmService)
+
+        # Initialize subscriber to respond to joystick inputs
         rospy.Subscriber(modTwistTopic, Twist, twistCallback)
         rospy.Subscriber(namespace + gripperStateTopic, Int8, gripperCallback)
         rospy.Subscriber(namespace + xyzArmOffsetTopic, Float32MultiArray, xyzArmCallback)

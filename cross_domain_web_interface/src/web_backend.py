@@ -28,6 +28,8 @@ prev_FE_State = FrontEndState()
 
 # declare URL of Robot
 robotEndpoint = "/updateRobotState"
+homeCameraEndpoint = "/homeCamera"
+homeArmEndpoint = "/homeArm"
 robotHostname = ""
 RobotURL = ""
 
@@ -274,6 +276,46 @@ def makePostReq(RobotURL, FEObj):
     else:
         return False
 
+@app.route('/homeArm', methods=['GET'])
+def homeArmCallback():
+    """
+    This function serves as the backend endpoint for the home the arm
+    button within the front-end interface.
+
+    params:
+        None
+    returns:
+        None
+    """
+    global robotHostname
+    # make url
+    homeArmURL = robotHostname + homeArmEndpoint
+
+    # make GET request to robot
+    statusString = requests.get(homeArmURL)
+
+    return "OK"
+
+@app.route('/homeCamera', methods=['GET'])
+def homeCameraCallback():
+    """
+    This function serves as the backend endpoint for the home the camera
+    buttont within the front-end interface.
+
+    params:
+        None
+    returns:
+        None
+    """
+    global robotHostname
+    # make url
+    homeCameraURL = robotHostname + homeCameraEndpoint
+
+    # make GET request to robot
+    statusString = requests.get(homeCameraURL)
+
+    return "OK"
+
 def allZero(FEObj):
     """
     This function checks the state of a given FrontEndState Object
@@ -349,6 +391,7 @@ def postIfChanged():
 def main():
     # reference globals
     global RobotURL
+    global robotHostname
     # set up arg parser
     parser = argparse.ArgumentParser(description='Enter ngrok domain name for robot.')
     parser.add_argument('-u','--url',action='store',dest='url',default=None,help='<Required> url link',required=True)
