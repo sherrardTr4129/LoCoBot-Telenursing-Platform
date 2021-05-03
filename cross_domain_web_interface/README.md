@@ -18,13 +18,15 @@ Note that the robot hostname is currently set to "http://localhost:12345" for te
 ## Backend API documentation
 The API that can be used to interact with the back end from the front end can be seen documented in the table below.
 
-|     Endpoint     | Method | JSON Data Format (Where x is the value) |                                                             Description                                                            |
-|:----------------:|:------:|:---------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------:|
-| /setFwdRev       | POST   | fwdRevData = { "fwdRev": x }            | This endpoint allows the frontend to update the linear velocity sent to the robot.                |
-| /setSpin         | POST   | spinData = { "spin": x }                | This endpoint allows the frontend to update the angular velocity sent to the robot.                |
-| /setArmOffsetX   | POST   | xData = { "xArmOffset": x}              | This endpoint allows the frontend to send an x-axis increment to move the end-effector in for the robot manipulator.               |
-| /setArmOffsetY   | POST   | yData = { "yArmOffset": x}              | This endpoint allows the frontend to send an y-axis increment to move the end-effector in for the robot manipulator.               |
-| /setArmOffsetZ   | POST   | zData = { "zArmOffset": x}              | This endpoint allows the frontend to send an z-axis increment to move the end-effector in for the robot manipulator.               |
-| /setPanOffset    | POST   | panData = { "panOffsetData": x}         | This endpoint allows the frontend to send an offset to move the "pan" of the pan-tilt camera base by.                              |
-| /setTiltOffset   | POST   | tiltData = {"tiltOffsetData": x}        | This endpoint allows the frontend to send an offset to move the "tile" of the pan-tilt camera base by.                             |
-| /setGripperState | POST   | gripperState = {"gripperStateData": x}  | This endpoint allows the frontend to send a new state for the robot gripper to try to achieve. The value should be either 0 or 1.  |
+| Endpoint         | Method | JSON Data Format (Where x is the value) | Description                                                                                                                       |
+|------------------|--------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
+| /setFwdRev       | POST   | fwdRevData = { "fwdRev": x }            | This endpoint allows the frontend to update the linear velocity sent to the robot.                                                |
+| /setSpin         | POST   | spinData = { "spin": x }                | This endpoint allows the frontend to update the angular velocity sent to the robot.                                               |
+| /setArmOffsetX   | POST   | xData = { "xArmOffset": x}              | This endpoint allows the frontend to send an x-axis increment to move the end-effector in for the robot manipulator.              |
+| /setArmOffsetY   | POST   | yData = { "yArmOffset": x}              | This endpoint allows the frontend to send an y-axis increment to move the end-effector in for the robot manipulator.              |
+| /setArmOffsetZ   | POST   | zData = { "zArmOffset": x}              | This endpoint allows the frontend to send an z-axis increment to move the end-effector in for the robot manipulator.              |
+| /setPanOffset    | POST   | panData = { "panOffsetData": x}         | This endpoint allows the frontend to send an offset to move the "pan" of the pan-tilt camera base by.                             |
+| /setTiltOffset   | POST   | tiltData = {"tiltOffsetData": x}        | This endpoint allows the frontend to send an offset to move the "tile" of the pan-tilt camera base by.                            |
+| /setGripperState | POST   | gripperState = {"gripperStateData": x}  | This endpoint allows the frontend to send a new state for the robot gripper to try to achieve. The value should be either 0 or 1. |
+| /homeArm         | GET    | N.A.                                    | This endpoint allows the frontend to send a request to home the arm to the backend.                                               |
+| /homeCamera      | GET    | N.A.                                    | This endpoint allows the frontend to send a request to home the camera pan-tilt base to the backend.                              |
