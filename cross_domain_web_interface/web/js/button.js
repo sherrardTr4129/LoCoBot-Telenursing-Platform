@@ -6,7 +6,7 @@
 
 function openFunction()
 {
-	openURL = "http://localhost:5000/setGripperState"
+	openURL = "http://robotcontrol.live:5000/setGripperState"
 	openData = {"gripperStateData": 1};
 	$.ajax({type: 'POST',
 		url: openURL,
@@ -19,7 +19,7 @@ function openFunction()
 
 function closeFunction()
 {
-        closeURL = "http://localhost:5000/setGripperState"
+        closeURL = "http://robotcontrol.live:5000/setGripperState"
         closeData = {"gripperStateData": 0};
         $.ajax({type: 'POST',
                 url: closeURL,
@@ -29,3 +29,5 @@ function closeFunction()
                 dataType: 'json'
         });
 }
+
+

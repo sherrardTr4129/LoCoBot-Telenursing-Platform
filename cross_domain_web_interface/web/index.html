@@ -66,7 +66,7 @@ body
 	flex: 1;
 	border: 1px solid gray;
 	margin: 2px;
-	padding: 10px;
+	padding: 30px;
 	&:first-child { margin-left: 0; }
 	&:last-child { margin-right: 0; }
 }
@@ -88,47 +88,73 @@ body
 	
 
 		</style>
-		<script src="../js/joy.js"></script>
-		<script src="../js/button.js"></script>
+		<script src="./js/joy.js"></script>
+		<script src="./js/button.js"></script>
+		<script src="./js/panTiltButton.js"></script>
+		<script src="./js/homeButtons.js"></script>
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 		</head>
 	<body>
 		<section class="columns">
 			<div class="column" align="center">
 				<div id="joy1" style="width:200px;height:200px;margin:30px">
-					<h2>Vertical: Y-axis</h2>
-					<h2>Horizontal: X-axis</h2>
+					<h2>Vertical: Out-In Arm</h2>
+					<h2>Horizontal: Right-Left Arm</h2>
 				</div>
 		        </div>
                         <div class="column" align="center">
                                 <div id="joy2" style="width:200px;height:200px;margin:50px">
 					<h2>Vertical:</h2>
-					<h2>Z-axis </h2>
+					<h2>Up-Down Arm </h2>
                                 </div>
                         </div>
 			<div class="column" align="center">
                                 <div id="joy3" style="width:200px;height:200px;margin:30px">
-                                        <h2>Vertical: FWD-REV </h2>
-                                        <h2>Horizontal: Spin</h2>
+                                        <h2>Vertical: Fwd-Rev Base </h2>
+                                        <h2>Horizontal: Turn Base</h2>
                                 </div>
                         </div>
 			<div class="column" align="center">
                                 <div id="buttons" style="width:200px;height:200px;margin:50px">
-					<h2>Gipper Controls</h2>
+					<h2>Gripper Controls</h2>
                                 	<button class="block" onclick="openFunction()">Open Gripper</button>
 					<h2></h2>
 					<button class="block" onclick="closeFunction()">Close Gripper</button>
 				</div>
                         </div>
-		</section> 
-		
+			<div class="column" align="center">
+                                <div id="buttons" style="width:200px;height:200px;margin:50px">
+                                        <h2>Pan Controls</h2>
+                                        <button class="block" onclick="posPanFunction()">Increase Pan</button>
+                                        <h2></h2>
+                                        <button class="block" onclick="negPanFunction()">Decrease Pan</button>
+                                </div>
+                        </div>
+			<div class="column" align="center">
+                                <div id="buttons" style="width:200px;height:200px;margin:50px">
+                                        <h2>Tilt Controls</h2>
+                                        <button class="block" onclick="posTiltFunction()">Increase Tilt</button>
+                                        <h2></h2>
+                                        <button class="block" onclick="negTiltFunction()">Decrease Tilt</button>
+                                </div>
+                        </div>
+		</section>
 
 		<section class="columns">
                         <div class="column" align="center">
-                                <iframe img src="http://localhost:8080/stream_viewer?topic=/trina2_1/right_arm_cam/color/image_raw" width="800" height="900"></iframe>
+                                <iframe img src="http://cdb669a0b759.ngrok.io/stream_viewer?topic=/camera/color/image_raw" id="stream" width="665" height="505"></iframe>
                         </div>
                 </section>
 
-		<script src="../js/joyReader.js"></script>
+		<section class="columns">
+                        <div class="column" align="center">
+				<button class="block" onclick="homeArmFunction()">Home Arm</button>
+				<h2></h2>
+				<button class="block" onclick="homeCameraFunction()">Home Camera</button>
+				<h2></h2>
+                        </div>
+                </section>
+
+		<script src="./js/joyReader.js"></script>
 	</body>
 </html>

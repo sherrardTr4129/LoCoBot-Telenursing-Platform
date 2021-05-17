@@ -9,6 +9,7 @@ import time
 import threading
 import copy
 import requests
+import argparse
 from json import dumps
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -21,13 +22,16 @@ CORS(app)
 # setup global state manager
 global FE_State
 global prev_FE_State
+global RobotURL
 FE_State = FrontEndState()
 prev_FE_State = FrontEndState()
 
 # declare URL of Robot
 robotEndpoint = "/updateRobotState"
-robotHostname = "http://localhost:12345"
-RobotURL = robotHostname + robotEndpoint
+homeCameraEndpoint = "/homeCamera"
+homeArmEndpoint = "/homeArm"
+robotHostname = ""
+RobotURL = ""
 
 # declare misc. variables
 DELAY = 0.3
@@ -52,6 +56,9 @@ def setFwdRev():
     fwdRevDict = request.get_json()
     fwdRevData = float(fwdRevDict['fwdRev'])
 
+    # scale data
+    fwdRevData = fwdRevData / 150
+
     # update the data in FE_State
     FE_State.set_fwd_rev(fwdRevData)
     
@@ -75,6 +82,9 @@ def setSpin():
     # extract data
     spinDataDict = request.get_json()
     spinData = float(spinDataDict['spin'])
+
+    # scale data
+    spinData = -spinData / 150
 
     # update the data in FE_State
     FE_State.set_spin(spinData)
@@ -255,6 +265,8 @@ def makePostReq(RobotURL, FEObj):
 
     # get JSON string
     JSONStr = jsonifyObj(FEObj)
+    print(JSONStr)
+    print(RobotURL)
 
     # make request
     statusString = requests.post(RobotURL, data=JSONStr)
@@ -263,6 +275,46 @@ def makePostReq(RobotURL, FEObj):
         return True
     else:
         return False
+
+@app.route('/homeArm', methods=['GET'])
+def homeArmCallback():
+    """
+    This function serves as the backend endpoint for the home the arm
+    button within the front-end interface.
+
+    params:
+        None
+    returns:
+        None
+    """
+    global robotHostname
+    # make url
+    homeArmURL = robotHostname + homeArmEndpoint
+
+    # make GET request to robot
+    statusString = requests.get(homeArmURL)
+
+    return "OK"
+
+@app.route('/homeCamera', methods=['GET'])
+def homeCameraCallback():
+    """
+    This function serves as the backend endpoint for the home the camera
+    buttont within the front-end interface.
+
+    params:
+        None
+    returns:
+        None
+    """
+    global robotHostname
+    # make url
+    homeCameraURL = robotHostname + homeCameraEndpoint
+
+    # make GET request to robot
+    statusString = requests.get(homeCameraURL)
+
+    return "OK"
 
 def allZero(FEObj):
     """
@@ -337,8 +389,22 @@ def postIfChanged():
         time.sleep(DELAY)
 
 def main():
+    # reference globals
+    global RobotURL
+    global robotHostname
+    # set up arg parser
+    parser = argparse.ArgumentParser(description='Enter ngrok domain name for robot.')
+    parser.add_argument('-u','--url',action='store',dest='url',default=None,help='<Required> url link',required=True)
+
+    # try to get args
+    result = parser.parse_args()
+    robotHostname = result.url
+
+    # construct new robot url
+    RobotURL = robotHostname + robotEndpoint
+
     # start flask app as a thread
-    threading.Thread(target=lambda: app.run(host="0.0.0.0", port=5000)).start()
+    threading.Thread(target=lambda: app.run(host="robotcontrol.live", port=5000)).start()
 
     # start the post thread
     thread = threading.Thread(target=postIfChanged)
