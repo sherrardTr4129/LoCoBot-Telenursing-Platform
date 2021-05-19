@@ -2,6 +2,7 @@
 import rospy
 from pyrobot import Robot
 import time
+import sys
 import numpy as np
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32MultiArray, Int8
@@ -87,22 +88,26 @@ def xyzArmCallback(msg):
     arm_z = msg.data[2]/ARM_DATA_SCALING
 
     if (arm_x == 0 and arm_y == 0 and arm_z == 0):
-        rospy.loginfo("no arm movement requested")
-    
+        #rospy.loginfo("no arm movement requested")
+        i=0 #placeholder
+
     else:
         # displacement = np.array([arm_x, arm_y, arm_z])
         # success = robot.arm.move_ee_xyz(displacement, plan=False)
         # rospy.loginfo("tried to move arm")
         displacement = np.array([arm_x, arm_y, arm_z])
         t,r,q = robot.arm.pose_ee
-        translation = np.add(np.asarray(t).flatten(), displacement)
-        orientation = np.asarray(r)
-        ident = np.eye(3)
-        orientation[:,2] = ident[:,2]
-        orientation[2,:] = ident[2,:]
-        robot.arm.set_ee_pose(translation, orientation, plan=False)
-        rospy.loginfo("translation was %s", str(translation))
-        rospy.loginfo("orientation was %s", str(orientation))
+        if (t[2]<0.1):
+            rospy.loginfo("arm too low, safety protocol activated with z=%s",str(t[2]))
+        else:
+            translation = np.add(np.asarray(t).flatten(), displacement)
+            orientation = np.asarray(r)
+            ident = np.eye(3)
+            orientation[:,2] = ident[:,2]
+            orientation[2,:] = ident[2,:]
+            robot.arm.set_ee_pose(translation, orientation, plan=False)
+            rospy.loginfo("translation was %s", str(translation))
+            rospy.loginfo("orientation was %s", str(orientation))
 
  
 def twistCallback(msg):
@@ -118,13 +123,16 @@ def twistCallback(msg):
         None
     """
     global robot
+
+
     # extract message components and scale
     fwdRev = (msg.linear.x)/FWD_REV_SCALING
     spin = (msg.angular.z)/SPIN_SCALING
 
+
     # Reduce cross-coupling of commands
-    if (spin<0.1 and fwdRev>5): spin=0
-    if (fwdRev < 0.5 and spin>0.2): fwdRev=0
+    if (abs(spin)<1 and abs(fwdRev)>20): spin=0
+    if (abs(fwdRev) < 5 and abs(spin)>5): fwdRev=0
 
     # Pass command to robot base
     execution_time = EXECUTION_TIME
@@ -144,7 +152,7 @@ def gripperCallback(msg):
     """
     global robot
     global gripper_state
-    rospy.loginfo("In gripper callback with req: %s", str(msg.data))
+    #rospy.loginfo("In gripper callback with req: %s", str(msg.data))
     if (msg.data==1 and gripper_state != 0):
         robot.gripper.open(wait=True)
         gripper_state = robot.gripper.get_gripper_state()
@@ -175,13 +183,15 @@ def panTiltCallback(msg):
         robot.camera.set_tilt(robot.camera.get_tilt() + tilt_sign * 0.1)
         rospy.loginfo("tilt set")
 
-def main():
+def main(laser):
     # reference interface globally
     global robot
     global gripper_state
     arm_config = dict(control_mode='torque')
-    use_laser = False
-    if (use_laser):
+
+
+    if (laser == "true"):
+
         modTwistTopic = "/artificial_potential/twist"
     else:
         modTwistTopic = namespace + twistTopic
@@ -209,5 +219,10 @@ def main():
         return
 
 if __name__ == "__main__":
-    main()
-    rospy.spin()
+    args = rospy.myargv(argv=sys.argv)
+    if len(args) < 2:
+        print("include use_laser argument")
+    else:
+        main(args[1])
+        rospy.spin()
+
