@@ -3,6 +3,7 @@
     <arg name="use_arm" default="true"/>
     <arg name="use_sim" default="false"/>
     <arg name="use_camera" default="true"/>
+    <arg name="use_laser" default="False"/>
 
     <include file="$(find locobot_control)/launch/main.launch">
         <arg name="use_base" value="$(arg use_base)"/>
@@ -13,6 +14,6 @@
 
     <node name="video_server" pkg="web_video_server" type="web_video_server" />
     <node name="ros_to_flask_bridge" pkg="flask_bridge" type="ros_flask_bridge.py" />
-    <node name="locobot_gui_ctrl" pkg="tn_locobot_control" type="locobot_gui_control.py" output="screen"/>
+    <node name="locobot_gui_ctrl" pkg="tn_locobot_control" type="locobot_gui_control.py" output="screen" args="$(arg use_laser)"/>
 
 </launch>

@@ -221,7 +221,7 @@ def main(laser):
 if __name__ == "__main__":
     args = rospy.myargv(argv=sys.argv)
     if len(args) < 2:
-        print("include use_laser argument")
+        rospy.logerr("include use_laser argument")
     else:
         main(args[1])
         rospy.spin()
