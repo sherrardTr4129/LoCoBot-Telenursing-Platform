@@ -15,14 +15,32 @@ import time
 # Create the Robot object that interfaces with the robot.
 robot = Robot('locobot')
 
-# import opencv
+# import opencv through pyRobot
 cv2 = try_cv2_import()
 
-# load image template
-template = cv2.imread("../template/armarker.jpg", 0)
-
 def find_target(image):
+    lower_lim = np.array([0,0,0])
+    upper_lim = np.array([0,0,0])
     target_center = (0,0)
+
+    # blur image
+    image_blurred = cv2.blur(image, (5,5))
+
+    # convert to HSV color space
+    hsv_image = cv2.cvtColor(image_blurred, cv.CV_BGR2HSV)
+
+    # create orange mask
+    orange_mask = cv2.inRange(hsv_image, lower_lim, upper_lim)
+
+    # dilate mask image
+    kernel = np.ones((5,5), np.uint8)
+    orange_mask_dialated = cv2.dilate(img, kernel, iterations=2)
+
+    # find contours in image
+    contours, hierarchy = cv2.findContours(orange_mask_dialated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # draw contours on original image
+    image = cv2.drawContours(image, contours, -1, (0, 255, 0), 2)
 
     return target_center, image
 
