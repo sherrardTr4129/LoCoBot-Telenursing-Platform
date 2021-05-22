@@ -19,37 +19,39 @@ robot = Robot('locobot')
 cv2 = try_cv2_import()
 
 def find_target(image):
-    lower_lim = np.array([0,0,0])
-    upper_lim = np.array([0,0,0])
+    lower_lim = np.array([66,87,200])
+    upper_lim = np.array([255,255,255])
     target_center = (0,0)
+
+    # make image copy
+    img_copy = image.copy()
 
     # blur image
     image_blurred = cv2.blur(image, (5,5))
 
     # convert to HSV color space
-    hsv_image = cv2.cvtColor(image_blurred, cv.CV_BGR2HSV)
+    hsv_image = cv2.cvtColor(image_blurred, cv2.COLOR_RGB2HSV)
 
     # create orange mask
     orange_mask = cv2.inRange(hsv_image, lower_lim, upper_lim)
 
     # dilate mask image
-    kernel = np.ones((5,5), np.uint8)
-    orange_mask_dialated = cv2.dilate(img, kernel, iterations=2)
+    kernel = np.ones((7,7), np.uint8)
+    orange_mask_dialated = cv2.dilate(orange_mask, kernel, iterations=2)
 
     # find contours in image
-    contours, hierarchy = cv2.findContours(orange_mask_dialated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    _, contours, _ = cv2.findContours(orange_mask_dialated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     
     # draw contours on original image
-    image = cv2.drawContours(image, contours, -1, (0, 255, 0), 2)
+    cv2.drawContours(img_copy, contours, -1, (0, 255, 0), 2)
 
-    return target_center, image
+    return target_center, img_copy
 
 def start_image_proc():
     while(True):
         try:
             # grab image
             rgb = robot.camera.get_rgb()
-	    rospy.loginfo(rgb)
 	    rgb = rgb[:, :, ::-1]
 
             # try to find target in image
