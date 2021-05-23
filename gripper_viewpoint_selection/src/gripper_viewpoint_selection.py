@@ -85,19 +85,23 @@ def direction_to_move(center_point, buffer_bounds):
     is_OOB_down = cy > y + h
     
     if(is_OOB_left):
-        direction_to_move_str[0] = "right"
-    elif(is_OOB_right):
         direction_to_move_str[0] = "left"
+    elif(is_OOB_right):
+        direction_to_move_str[0] = "right"
     if(is_OOB_up):
-        direction_to_move_str[1] = "down"
-    elif(is_OOB_down):
         direction_to_move_str[1] = "up"
+    elif(is_OOB_down):
+        direction_to_move_str[1] = "down"
 
     return direction_to_move_str   
 
 def start_image_proc():
     # flag to indicate drawing over image
     IS_DRAWING = True
+
+    # define pan-tilt increment values
+    pan_inc = 0.05
+    tilt_inc = 0.05
 
     # define buffer zone
     width = 400
@@ -126,6 +130,13 @@ def start_image_proc():
                 continue
 
             if(IS_DRAWING):
+                # draw lines to indicate the out of bounds zones
+                img_shape = img_copy.shape
+                cv2.line(img_copy, (0, buffer_TL[1]), (img_shape[1], buffer_TL[1]), (0,255,0), thickness=2)
+                cv2.line(img_copy, (0, buffer_TL[1] + height), (img_shape[1], buffer_TL[1]+height), (0,255,0), thickness=2)
+                cv2.line(img_copy, (buffer_TL[0], 0), (buffer_TL[0], img_shape[0]), (0,255,0), thickness=2)
+                cv2.line(img_copy, (buffer_TL[0] + width, 0), (buffer_TL[0] + width, img_shape[0]), (0,255,0), thickness=2)
+
                 # draw buffer area on image
                 cv2.rectangle(img_copy, buffer_TL, buffer_BR, (255,0,255), 2)
 
@@ -142,7 +153,26 @@ def start_image_proc():
 	    if(is_in_buffer):
                 pass
             else:
-		dir_str = direction_to_move(target_center, buffer_bounds)
+		# get updated robot pan-tilt pose
+                updated_camera_pose = robot.camera.get_state()
+                updated_camera_pose[0] = round(updated_camera_pose[0], 2)
+                updated_camera_pose[1] = round(updated_camera_pose[1], 2)
+
+                # find direction to move
+                dir_str = direction_to_move(target_center, buffer_bounds)
+
+                # perform increment/decrement
+                if(dir_str[0] == "right"):
+                    updated_camera_pose[0] -= pan_inc
+                elif(dir_str[0] == "left"):
+                    updated_camera_pose[0] += pan_inc
+                if(dir_str[1] == "up"):
+                    updated_camera_pose[1] -= tilt_inc
+                elif(dir_str[1] == "down"):
+                    updated_camera_pose[1] += tilt_inc
+
+		# set new pose
+                robot.camera.set_pan_tilt(updated_camera_pose[0], updated_camera_pose[1], wait=False)
 
             cv2.imshow('Color', img_copy)
             cmdChar = cv2.waitKey(1)
