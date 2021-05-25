@@ -19,6 +19,25 @@ robot = Robot('locobot')
 cv2 = try_cv2_import()
 
 def find_target(image):
+    """
+    This function attempts to find the orange end-effector
+    target mounted on the LoCoBot arm. 
+
+    params:
+        image (OpenCV RGB image): The current frame extracted from the 
+                                  LoCoBot pan-tilt camera.
+    returns:
+        target_center (int, int): A tuple representing the image coordinates
+                                  of the center of the detected target within 
+                                  the camera frame. Tuple elements will be None
+                                  if no target was detected.
+
+        b_box (int, int, int, int): A tuple representing the target bounding box. Tuple
+                                    elements will all be None if no target was detected.
+                                    Tuple stucture is (TL_x, TL_y, width, height)
+    """
+
+    # HSV color space limits of orange vision target
     lower_lim = np.array([66,87,200])
     upper_lim = np.array([255,255,255])
 
@@ -64,6 +83,21 @@ def find_target(image):
     return target_center, b_box
 
 def in_buffer(center_point, buffer_bounds):
+    """
+    This function determines whether or not a given
+    point is within a given buffer region or not. 
+
+    params:
+        center_point (int, int): A tuple representing the image coordinates
+                                  of the center of the detected target within 
+                                  the camera frame.
+
+        buffer_bounds (int, int, int. int): A tuple representing the buffer to check within.
+                                            Tuple stucture is (TL_x, TL_y, width, height
+
+    returns:
+        in_buffer (bool): A boolean indicating whether or not the point is within the buffer
+    """
     cx, cy = center_point
     x, y, w, h = buffer_bounds
 
