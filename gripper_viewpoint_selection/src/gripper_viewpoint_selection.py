@@ -108,6 +108,22 @@ def in_buffer(center_point, buffer_bounds):
     return (x_in_bounds and y_in_bounds)
 
 def direction_to_move(center_point, buffer_bounds):
+    """
+    this function determines the direction to move in the X and Y 
+    image axis while in "search mode" based off of the detected center
+    point of the vision target.
+
+    center_point (int, int): A tuple representing the image coordinates
+                             of the center of the detected target within 
+                             the camera frame.
+
+    buffer_bounds (int, int, int. int): A tuple representing the buffer to check within.
+                                        Tuple stucture is (TL_x, TL_y, width, height
+
+    returns:
+        direction_to_move_str (str, str): A tuple containing the direction to move in the 
+                                          X and Y axes of the image coordinate system. 
+    """
     cx, cy = center_point
     x, y, w, h = buffer_bounds
     direction_to_move_str = ["", ""]
@@ -130,6 +146,9 @@ def direction_to_move(center_point, buffer_bounds):
     return direction_to_move_str   
 
 def start_image_proc():
+    """
+    This function serves as the driver for the viewpoint selection algorithm.
+    """
     # flag to indicate drawing over image
     IS_DRAWING = True
 
