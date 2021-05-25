@@ -104,16 +104,23 @@ def start_image_proc():
     tilt_inc = 0.05
 
     # define buffer zone
-    width = 400
-    height = 200
-    buffer_TL = (125, 125)
-    buffer_BR = (buffer_TL[0] + width, buffer_TL[1] + height)
-    buffer_bounds = (buffer_TL[0], buffer_TL[1], width, height)
+    big_width = 400
+    big_height = 200
+    big_buffer_TL = (125, 125)
+    big_buffer_BR = (big_buffer_TL[0] + big_width, big_buffer_TL[1] + big_height)
+    buffer_bounds_big = (big_buffer_TL[0], big_buffer_TL[1], big_width, big_height)
+
+    # define center buffer zone size
+    center_zone_width = 100
+    center_zone_height = 100
 
     # move pan-tilt camera to initial position
     robot.camera.reset()
     init_camera_pose = [0.0, 0.35]
     robot.camera.set_pan_tilt(init_camera_pose[0], init_camera_pose[1], wait=True)
+
+    # declare control boolean for tracking mode
+    in_tracking_mode = False
 
     while(True):
         try:
@@ -129,16 +136,26 @@ def start_image_proc():
             if(None in target_center or None in b_box):
                 continue
 
+            # set up center buffer ROI based on image shape
+            img_shape = img_copy.shape
+            img_center_x = img.shape[0]/2
+            img_center_y = img.shape[1]/2
+            center_buffer_TL = ((img_center_x - (center_zone_width/2)), (center_zone_height - (center_zone_height/2)))
+            center_buffer_BR = ((img_center_x + (center_zone_width/2)), (center_zone_height + (center_zone_height/2)))
+            buffer_bounds_center = (center_buffer_TL[0], center_buffer_TL[1], center_zone_width, center_zone_height)
+
             if(IS_DRAWING):
                 # draw lines to indicate the out of bounds zones
-                img_shape = img_copy.shape
-                cv2.line(img_copy, (0, buffer_TL[1]), (img_shape[1], buffer_TL[1]), (0,255,0), thickness=2)
-                cv2.line(img_copy, (0, buffer_TL[1] + height), (img_shape[1], buffer_TL[1]+height), (0,255,0), thickness=2)
-                cv2.line(img_copy, (buffer_TL[0], 0), (buffer_TL[0], img_shape[0]), (0,255,0), thickness=2)
-                cv2.line(img_copy, (buffer_TL[0] + width, 0), (buffer_TL[0] + width, img_shape[0]), (0,255,0), thickness=2)
+                cv2.line(img_copy, (0, big_buffer_TL[1]), (img_shape[1], big_buffer_TL[1]), (0,255,0), thickness=2)
+                cv2.line(img_copy, (0, big_buffer_TL[1] + big_height), (img_shape[1], big_buffer_TL[1] + big_height), (0,255,0), thickness=2)
+                cv2.line(img_copy, (big_buffer_TL[0], 0), (big_buffer_TL[0], img_shape[0]), (0,255,0), thickness=2)
+                cv2.line(img_copy, (big_buffer_TL[0] + big_width, 0), (big_buffer_TL[0] + big_width, img_shape[0]), (0,255,0), thickness=2)
 
                 # draw buffer area on image
-                cv2.rectangle(img_copy, buffer_TL, buffer_BR, (255,0,255), 2)
+                cv2.rectangle(img_copy, big_buffer_TL, big_buffer_BR, (255,0,255), 2)
+
+                # draw center buffer zone on image
+                cv2.rectangle(img_copy, center_buffer_TL, center_buffer_BR, (0,0,255), 2)
 
                 # draw target bounding box
                 cv2.rectangle(img_copy, (b_box[0], b_box[1]), (b_box[0] + b_box[2], b_box[1] + b_box[3]), (255,0,0), 2)
@@ -146,33 +163,43 @@ def start_image_proc():
                 # draw marker on image center
                 cv2.drawMarker(img_copy, target_center, (0,0,0), markerType=cv2.MARKER_CROSS, thickness=3)
 
-            # check if detected center point is in buffer
+            # check if detected center point is in big buffer
             is_in_buffer = in_buffer(target_center, buffer_bounds)
 
-            # if so, do nothing. Otherwise, move in direction it was last seen. 
-	    if(is_in_buffer):
+            # if we're in the buffer and not in tracking mode, do nothing
+	    if(is_in_buffer and not in_tracking_mode):
                 pass
+
+            # otherwise activate tracking mode
             else:
-		# get updated robot pan-tilt pose
-                updated_camera_pose = robot.camera.get_state()
-                updated_camera_pose[0] = round(updated_camera_pose[0], 2)
-                updated_camera_pose[1] = round(updated_camera_pose[1], 2)
+                # check if we are in center buffer again
+                is_in_center_buffer = in_buffer(target_center, buffer_bounds_center)
 
-                # find direction to move
-                dir_str = direction_to_move(target_center, buffer_bounds)
+                if(is_in_center_buffer):
+                    in_tracking_mode = False
+                else:
+                    in_tracking_mode = True
 
-                # perform increment/decrement
-                if(dir_str[0] == "right"):
-                    updated_camera_pose[0] -= pan_inc
-                elif(dir_str[0] == "left"):
-                    updated_camera_pose[0] += pan_inc
-                if(dir_str[1] == "up"):
-                    updated_camera_pose[1] -= tilt_inc
-                elif(dir_str[1] == "down"):
-                    updated_camera_pose[1] += tilt_inc
+		    # get updated robot pan-tilt pose
+                    updated_camera_pose = robot.camera.get_state()
+                    updated_camera_pose[0] = round(updated_camera_pose[0], 2)
+                    updated_camera_pose[1] = round(updated_camera_pose[1], 2)
 
-		# set new pose
-                robot.camera.set_pan_tilt(updated_camera_pose[0], updated_camera_pose[1], wait=False)
+                    # find direction to move
+                    dir_str = direction_to_move(target_center, buffer_bounds_center)
+
+                    # perform increment/decrement
+                    if(dir_str[0] == "right"):
+                        updated_camera_pose[0] -= pan_inc
+                    elif(dir_str[0] == "left"):
+                        updated_camera_pose[0] += pan_inc
+                    if(dir_str[1] == "up"):
+                        updated_camera_pose[1] -= tilt_inc
+                    elif(dir_str[1] == "down"):
+                        updated_camera_pose[1] += tilt_inc
+
+		    # set new pose
+                    robot.camera.set_pan_tilt(updated_camera_pose[0], updated_camera_pose[1], wait=False)
 
             cv2.imshow('Color', img_copy)
             cmdChar = cv2.waitKey(1)
