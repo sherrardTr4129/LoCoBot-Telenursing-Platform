@@ -164,8 +164,8 @@ def start_image_proc():
     buffer_bounds_big = (big_buffer_TL[0], big_buffer_TL[1], big_width, big_height)
 
     # define center buffer zone size
-    center_zone_width = 100
-    center_zone_height = 100
+    center_zone_width = 50
+    center_zone_height = 50
 
     # move pan-tilt camera to initial position
     robot.camera.reset()
@@ -191,10 +191,10 @@ def start_image_proc():
 
             # set up center buffer ROI based on image shape
             img_shape = img_copy.shape
-            img_center_x = img.shape[0]/2
-            img_center_y = img.shape[1]/2
-            center_buffer_TL = ((img_center_x - (center_zone_width/2)), (center_zone_height - (center_zone_height/2)))
-            center_buffer_BR = ((img_center_x + (center_zone_width/2)), (center_zone_height + (center_zone_height/2)))
+            img_center_x = img_shape[1]/2
+            img_center_y = img_shape[0]/2
+            center_buffer_TL = ((img_center_x - (center_zone_width/2)), (img_center_y - (center_zone_height/2)))
+            center_buffer_BR = ((img_center_x + (center_zone_width/2)), (img_center_y + (center_zone_height/2)))
             buffer_bounds_center = (center_buffer_TL[0], center_buffer_TL[1], center_zone_width, center_zone_height)
 
             if(IS_DRAWING):
@@ -217,7 +217,7 @@ def start_image_proc():
                 cv2.drawMarker(img_copy, target_center, (0,0,0), markerType=cv2.MARKER_CROSS, thickness=3)
 
             # check if detected center point is in big buffer
-            is_in_buffer = in_buffer(target_center, buffer_bounds)
+            is_in_buffer = in_buffer(target_center, buffer_bounds_big)
 
             # if we're in the buffer and not in tracking mode, do nothing
 	    if(is_in_buffer and not in_tracking_mode):
