@@ -4,12 +4,16 @@
     <arg name="use_sim" default="false"/>
     <arg name="use_camera" default="true"/>
     <arg name="use_laser" default="False"/>
+    <arg name="use_rviz" default="false"/>
+    <arg name="use_vslam" default="true"/>
 
     <include file="$(find locobot_control)/launch/main.launch">
         <arg name="use_base" value="$(arg use_base)"/>
         <arg name="use_arm" value="$(arg use_arm)"/>
         <arg name="use_sim" value="$(arg use_sim)"/>
         <arg name="use_camera" value="$(arg use_camera)"/>
+        <arg name="use_rviz" value="$(arg use_rviz)"/>
+        <arg name="use_vslam" value="$(arg use_vslam)"/>
     </include>
 
     <node name="video_server" pkg="web_video_server" type="web_video_server" />
