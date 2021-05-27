@@ -11,6 +11,7 @@ from pyrobot.utils.util import try_cv2_import
 import numpy as np
 import rospy
 import time
+import math
 
 # Create the Robot object that interfaces with the robot.
 robot = Robot('locobot')
@@ -18,7 +19,7 @@ robot = Robot('locobot')
 # import opencv through pyRobot
 cv2 = try_cv2_import()
 
-def find_target(image):
+def find_target(image, circularity_thresh=0.81):
     """
     This function attempts to find the orange end-effector
     target mounted on the LoCoBot arm. 
@@ -26,6 +27,9 @@ def find_target(image):
     params:
         image (OpenCV RGB image): The current frame extracted from the 
                                   LoCoBot pan-tilt camera.
+
+	circularity_thresh (float): The threshold of circularity to be considered
+				    a valid detection
     returns:
         target_center (int, int): A tuple representing the image coordinates
                                   of the center of the detected target within 
@@ -71,6 +75,18 @@ def find_target(image):
 
     index_of_max = np.argmax(area_list)
     largest_contour = contours[index_of_max]
+
+    # make sure largest contour is mostly circular
+    perimeter = cv2.arcLength(largest_contour, True)
+    area = cv2.contourArea(largest_contour)
+
+    if(perimeter == 0):
+        return (None, None), (None, None, None, None)
+
+    circularity = 4*math.pi*(area/(perimeter**2))
+
+    if(circularity < circularity_thresh):
+        return (None, None), (None, None, None, None)
     
     # find target bounding box
     b_box = cv2.boundingRect(largest_contour)
