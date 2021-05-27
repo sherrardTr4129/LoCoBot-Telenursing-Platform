@@ -58,7 +58,7 @@ def find_target(image):
     orange_mask_dialated = cv2.dilate(orange_mask, kernel, iterations=2)
 
     # find contours in image
-    _, contours, _ = cv2.findContours(orange_mask_dialated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(orange_mask_dialated, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # exit early if no contours found
     if(len(contours) == 0):
@@ -175,6 +175,9 @@ def start_image_proc():
     # declare control boolean for tracking mode
     in_tracking_mode = False
 
+    # declare control boolean to indicate lost target
+    target_lost = False
+
     while(True):
         try:
             # grab image
@@ -185,9 +188,11 @@ def start_image_proc():
             # try to find target in image
 	    target_center, b_box = find_target(rgb)
 
-	    # skip this frame if target not found
+	    # skip processing this frame if target not found
             if(None in target_center or None in b_box):
-                continue
+                target_lost = True
+            else:
+                target_lost = False
 
             # set up center buffer ROI based on image shape
             img_shape = img_copy.shape
@@ -210,17 +215,20 @@ def start_image_proc():
                 # draw center buffer zone on image
                 cv2.rectangle(img_copy, center_buffer_TL, center_buffer_BR, (0,0,255), 2)
 
-                # draw target bounding box
-                cv2.rectangle(img_copy, (b_box[0], b_box[1]), (b_box[0] + b_box[2], b_box[1] + b_box[3]), (255,0,0), 2)
+                if(not target_lost):
+                    # draw target bounding box
+                    cv2.rectangle(img_copy, (b_box[0], b_box[1]), (b_box[0] + b_box[2], b_box[1] + b_box[3]), (255,0,0), 2)
 
-                # draw marker on image center
-                cv2.drawMarker(img_copy, target_center, (0,0,0), markerType=cv2.MARKER_CROSS, thickness=3)
+                    # draw marker on target center
+                    cv2.drawMarker(img_copy, target_center, (0,0,0), markerType=cv2.MARKER_CROSS, thickness=3)
 
             # check if detected center point is in big buffer
-            is_in_buffer = in_buffer(target_center, buffer_bounds_big)
+            is_in_buffer = True
+            if(not target_lost):
+                is_in_buffer = in_buffer(target_center, buffer_bounds_big)
 
             # if we're in the buffer and not in tracking mode, do nothing
-	    if(is_in_buffer and not in_tracking_mode):
+	    if(is_in_buffer and not in_tracking_mode or target_lost):
                 pass
 
             # otherwise activate tracking mode
