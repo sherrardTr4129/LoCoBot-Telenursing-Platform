@@ -22,6 +22,10 @@ homeArmServiceName = "homeArmSrv"
 # ------------------------
 # NOTE: arm data scaling of 5000 seems to work well for gazebo and physical robot
 ARM_DATA_SCALING = 5000.0
+# NOTE: we need a larger increment value to move upwards in Z axis, so decrease scaling in this case
+ARM_DATA_SCALING_UP_Z = 2800
+# NOTE: we need a smaller increment value to move downwards in Z axis, so increase scaling in this case
+ARM_DATA_SCALING_DOWN_Z = 5750
 # NOTE: fwd_rev data scaling of 3 seems to work well for gazbeo and physical robot
 FWD_REV_SCALING = 3
 # NOTE: spin data scaling of 3 seems to work well for gazebo, while a
@@ -30,6 +34,10 @@ SPIN_SCALING = 1
 # NOTE: an execution time of 0.015 seems to work well for the physical robot, while a
 #	value of 0.00015 seems to work best for the robot in a gazebo env.
 EXECUTION_TIME = 0.015
+
+# set min and max z-axis values
+min_z = 0.1
+max_z = 0.45
 
 def homeArmService(req):
     """
@@ -85,7 +93,13 @@ def xyzArmCallback(msg):
     # we will scale to [-0.1,0.1]
     arm_x = msg.data[0]/ARM_DATA_SCALING
     arm_y = msg.data[1]/ARM_DATA_SCALING
-    arm_z = msg.data[2]/ARM_DATA_SCALING
+    arm_z = msg.data[2]
+
+    # conditionally scale Z axis movements
+    if(arm_z > 0):
+        arm_z = msg.data[2] / ARM_DATA_SCALING_UP_Z
+    elif(arm_z < 0):
+        arm_z = msg.data[2] / ARM_DATA_SCALING_DOWN_Z
 
     if (arm_x == 0 and arm_y == 0 and arm_z == 0):
         #rospy.loginfo("no arm movement requested")
@@ -97,8 +111,10 @@ def xyzArmCallback(msg):
         # rospy.loginfo("tried to move arm")
         displacement = np.array([arm_x, arm_y, arm_z])
         t,r,q = robot.arm.pose_ee
-        if (t[2]<0.1):
+        if (t[2] < min_z):
             rospy.loginfo("arm too low, safety protocol activated with z=%s",str(t[2]))
+        elif(t[2] > max_z):
+            rospy.loginfo("arm too high, safety protocol activated with z=%s",str(t[2]))
         else:
             translation = np.add(np.asarray(t).flatten(), displacement)
             orientation = np.asarray(r)
