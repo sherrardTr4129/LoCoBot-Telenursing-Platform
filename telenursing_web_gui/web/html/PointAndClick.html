@@ -2,8 +2,9 @@
 <head>
   <link rel='stylesheet' type='text/css' href='../css/GUINavBar.css'>
   <link rel='stylesheet' type='text/css' href='../css/MainPageThreeColumn.css'>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="../js/joy.js"></script>
+  <script src="../js/handleImageClick.js"></script>
 </head>
 
 <div class="navbar">
@@ -12,19 +13,22 @@
   <a class="active" href="#">Point And Click Control</a>
 </div>
 
+<!-- Point and Click interface and peripheral indicators-->
 <section class="columns">
 	<div id="leftDiv" style="padding:200px;background-color:#decddd;float:left"></div>
 	<div class="column" align="center">
 		<h2>Point And Click Interface</h2>
-		<iframe id="taskPageSecondaryStream" img src="http://localhost:8080/stream_viewer?topic=/locobot/secondaryCameraStream/color/image_raw" width="650" height="500"></iframe>
+		<img src="http://7d321568e405.ngrok.io/stream?topic=/image_view/output"</img>
 	</div>
 	<div id="rightDiv" style="padding:200px;background-color:#decddd;float:left"></div>
 </section>
 
+<!-- Reverse collision detection indicators -->
 <section class="columns">
 	<div id="bottomtDiv" style="padding:10px;height:10%;width:100%;background-color:#decddd;float:left"></div>
 </section>
 
+<!-- joystick for small corrective motions and collision escapes -->
 <section class="columns">
 	<div class="column" align="center">
 		<h2>Forward/Reverse Control</h2>
@@ -33,5 +37,4 @@
 	</div>
 
 	<script src="../js/joyReaderPandC.js"></script>
-
 </section>
