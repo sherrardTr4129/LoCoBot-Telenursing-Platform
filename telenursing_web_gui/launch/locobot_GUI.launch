@@ -1,5 +1,0 @@
-<launch>
-	<node name="video_server" pkg="web_video_server" type="web_video_server" />
-	<node name="gui_backend" pkg="telenursing_web_gui" type="flask_to_joy_locobot.py" />
-	<node name="resize_and_repub" pkg="telenursing_web_gui" type="resize_and_repub_locobot.py" />
-</launch>
