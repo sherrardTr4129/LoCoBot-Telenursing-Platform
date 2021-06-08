@@ -5,7 +5,7 @@
  */
 
 // read fwdRev data joystick and send data to flask app on 200 ms interval
-var Joy7 = new JoyStick('joy4');
+var Joy4 = new JoyStick('joy4');
 var frURL = "http://localhost:5000/fwdRevJoyPost";
 var frData = {
 	"FwdRev": 0,
