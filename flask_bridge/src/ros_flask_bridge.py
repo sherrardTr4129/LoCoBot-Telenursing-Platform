@@ -81,6 +81,22 @@ def homeArmCB():
 
     return "OK"
 
+@app.route('/camCoordinates', methods=['GET'])
+def camCoordinates():
+    """
+    This function serves as the designated bridge endpoint
+    that is used to recieve user selected coordinates within the
+    image stream
+
+    params:
+        None
+    returns:
+        None
+    """
+
+    camCoords = request.get_json()
+    rospy.logerr(camCoords)
+
 @app.route('/updateRobotState', methods=['POST'])
 def updateRobotStateCB():
     """
