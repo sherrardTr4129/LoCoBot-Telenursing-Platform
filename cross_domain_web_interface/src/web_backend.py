@@ -30,6 +30,7 @@ prev_FE_State = FrontEndState()
 robotEndpoint = "/updateRobotState"
 homeCameraEndpoint = "/homeCamera"
 homeArmEndpoint = "/homeArm"
+camEndpoint = "/camCoordinates"
 robotHostname = ""
 RobotURL = ""
 
@@ -234,6 +235,32 @@ def setGripperState():
     FE_State.set_gripper_state(gripperStateData)
 
     # return status
+    return "OK"
+
+@app.route('/sendCamSelection', methods=['POST'])
+def sendCamSelection():
+    """
+    This function takes the selected camera stream X,Y position
+    and transmits that data to the robot for deprojection.
+
+    params:
+        None
+    returns:
+        None
+    """
+
+    global robotHostname
+
+    # extract data from request
+    cameraCoordinateDict = request.get_json()
+    print(cameraCoordinateDict)
+
+    # make URL
+    camCoordinateURL = robotHostname + camEndpoint
+
+    # make request to robot
+    statusString = requests.post(camCoordinateURL, data=cameraCoordinateDict)
+
     return "OK"
 
 def jsonifyObj(FEObj):
