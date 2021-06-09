@@ -259,7 +259,7 @@ def sendCamSelection():
     camCoordinateURL = robotHostname + camEndpoint
 
     # make request to robot
-    statusString = requests.post(camCoordinateURL, data=cameraCoordinateDict)
+    statusString = requests.post(camCoordinateURL, json=cameraCoordinateDict)
 
     return "OK"
 
