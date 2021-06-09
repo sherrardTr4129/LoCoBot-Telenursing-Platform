@@ -5,7 +5,7 @@
     <arg name="use_camera" default="true"/>
     <arg name="use_laser" default="False"/>
     <arg name="use_rviz" default="false"/>
-    <arg name="use_vslam" default="true"/>
+    <arg name="use_vslam" default="false"/>
 
     <include file="$(find locobot_control)/launch/main.launch">
         <arg name="use_base" value="$(arg use_base)"/>
