@@ -4,7 +4,7 @@ from pyrobot import Robot
 import time
 import sys
 import numpy as np
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, PointStamped
 from std_msgs.msg import Float32MultiArray, Int8
 from tn_locobot_control.srv import homeCamera, homeCameraResponse
 from tn_locobot_control.srv import homeArm, homeArmResponse
@@ -41,6 +41,8 @@ EXECUTION_TIME = 0.015
 min_z = 0.1
 max_z = 0.45
 
+pubTest = rospy.Publisher('chatter', PointStamped, queue_size=10)
+
 def homeArmService(req):
     """
     This function serves as the service callback to home the robot arm
@@ -68,7 +70,20 @@ def PointAndClickService(req):
     returns:
         response (pointAndClickResponse instance): the service result
     """
-    print(str(req.x) + ", " + str(req.y))
+    global robot
+
+    # get real world points in robot base frame
+    pt, color = robot.camera.pix_to_3dpt(req.row, req.col)
+
+    testPt = PointStamped()
+    testPt.point.x = pt[0][0]
+    testPt.point.y = pt[0][1]
+    testPt.point.z = pt[0][2]
+    testPt.header.stamp = rospy.Time.now()
+    testPt.header.frame_id = "base_link"
+    pubTest.publish(testPt)
+    print(pt)
+
     return pointAndClickResponse(True)
 
 def homeCameraService(req):

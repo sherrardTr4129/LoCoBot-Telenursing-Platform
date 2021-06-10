@@ -1,4 +1,4 @@
-int16 x
-int16 y
+int16 row
+int16 col
 ---
 bool status

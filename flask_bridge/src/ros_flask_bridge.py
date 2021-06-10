@@ -98,8 +98,8 @@ def camCoordinates():
 
     # extract data from request
     camCoords = request.json
-    xCoord = camCoords["imgX"]
-    yCoord = camCoords["imgY"]
+    col = camCoords["imgX"]
+    row = camCoords["imgY"]
 
     # wait for service to come up
     rospy.wait_for_service(pointAndClickServiceName)
@@ -107,7 +107,7 @@ def camCoordinates():
     # make ROS service call
     try:
         serv_client = rospy.ServiceProxy(pointAndClickServiceName, pointAndClick)
-        response = serv_client(xCoord, yCoord)
+        response = serv_client(row, col)
     except rospy.ServiceException as error:
         rospy.logerr('point and click service error failed: %s' % error)
     
