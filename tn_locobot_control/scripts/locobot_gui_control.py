@@ -8,6 +8,7 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32MultiArray, Int8
 from tn_locobot_control.srv import homeCamera, homeCameraResponse
 from tn_locobot_control.srv import homeArm, homeArmResponse
+from tn_locobot_control.srv import pointAndClick, pointAndClickResponse
 
 # define misc variables
 namespace = "/pyRobot_web_data/"
@@ -17,6 +18,7 @@ panTiltOffsetTopic = "pan_tilt_offset"
 xyzArmOffsetTopic = "xyz_arm_offet"
 homeCameraServiceName = "homeCameraSrv"
 homeArmServiceName = "homeArmSrv"
+pointAndClickServiceName = "PointAndClickSrv"
 
 # define scaling constants
 # ------------------------
@@ -55,6 +57,19 @@ def homeArmService(req):
 
     # return status
     return homeArmResponse(True)
+
+def PointAndClickService(req):
+    """
+    This function serves as the service callback to extract real-world
+    coordinates from data obtained from user point and click interface
+
+    params:
+	req(pointAndClick instance): the pointAndClick request
+    returns:
+        response (pointAndClickResponse instance): the service result
+    """
+    print(str(req.x) + ", " + str(req.y))
+    return pointAndClickResponse(True)
 
 def homeCameraService(req):
     """
@@ -221,6 +236,7 @@ def main(laser):
         # initialize services
         homeCameraServ = rospy.Service(homeCameraServiceName, homeCamera, homeCameraService)
         homeArmServ = rospy.Service(homeArmServiceName, homeArm, homeArmService)
+        pointAndClickSrv = rospy.Service(pointAndClickServiceName, pointAndClick, PointAndClickService)
 
         # Initialize subscriber to respond to joystick inputs
         rospy.Subscriber(modTwistTopic, Twist, twistCallback)

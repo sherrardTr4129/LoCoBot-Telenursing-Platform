@@ -15,6 +15,7 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Float32MultiArray, Int8
 from tn_locobot_control.srv import homeCamera, homeCameraResponse
 from tn_locobot_control.srv import homeArm, homeArmResponse
+from tn_locobot_control.srv import pointAndClick, pointAndClickResponse
 
 # initialize flask
 app = Flask(__name__)
@@ -34,6 +35,7 @@ panTiltOffsetTopic = "pan_tilt_offset"
 xyzArmOffsetRopic = "xyz_arm_offet"
 homeCameraServiceName = "homeCameraSrv"
 homeArmServiceName = "homeArmSrv"
+pointAndClickServiceName = "PointAndClickSrv"
 
 @app.route('/homeCamera', methods=['GET'])
 def homeCameraCB():
@@ -81,7 +83,7 @@ def homeArmCB():
 
     return "OK"
 
-@app.route('/camCoordinates', methods=['GET'])
+@app.route('/camCoordinates', methods=['POST'])
 def camCoordinates():
     """
     This function serves as the designated bridge endpoint
@@ -94,8 +96,22 @@ def camCoordinates():
         None
     """
 
-    camCoords = request.get_json()
-    rospy.logerr(camCoords)
+    # extract data from request
+    camCoords = request.json
+    xCoord = camCoords["imgX"]
+    yCoord = camCoords["imgY"]
+
+    # wait for service to come up
+    rospy.wait_for_service(pointAndClickServiceName)
+
+    # make ROS service call
+    try:
+        serv_client = rospy.ServiceProxy(pointAndClickServiceName, pointAndClick)
+        response = serv_client(xCoord, yCoord)
+    except rospy.ServiceException as error:
+        rospy.logerr('point and click service error failed: %s' % error)
+    
+    return "OK"    
 
 @app.route('/updateRobotState', methods=['POST'])
 def updateRobotStateCB():
