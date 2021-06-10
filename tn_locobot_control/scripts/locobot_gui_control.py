@@ -75,6 +75,7 @@ def PointAndClickService(req):
     # get real world points in robot base frame
     pt, color = robot.camera.pix_to_3dpt(req.row, req.col)
 
+    # publish point for rviz visualization
     testPt = PointStamped()
     testPt.point.x = pt[0][0]
     testPt.point.y = pt[0][1]
@@ -82,7 +83,12 @@ def PointAndClickService(req):
     testPt.header.stamp = rospy.Time.now()
     testPt.header.frame_id = "base_link"
     pubTest.publish(testPt)
+
+    # print recieved point
     print(pt)
+
+    # try to move to point
+    robot.base.go_to_relative([pt[0][0], pt[0][1], 0.0], use_map=True, smooth=False, close_loop=True)
 
     return pointAndClickResponse(True)
 
@@ -234,7 +240,7 @@ def main(laser):
     global robot
     global gripper_state
     arm_config = dict(control_mode='torque')
-
+    base_config_dict = {'base_controller': 'proportional', 'base_planner':'movebase'}
 
     if (laser == "true"):
 
@@ -244,7 +250,7 @@ def main(laser):
     # start robot control
     try:
         # Home robot arm
-        robot = Robot('locobot', arm_config=arm_config)
+        robot = Robot('locobot', arm_config=arm_config, base_config=base_config_dict)
         robot.arm.go_home()
         gripper_state = robot.gripper.get_gripper_state()
 
