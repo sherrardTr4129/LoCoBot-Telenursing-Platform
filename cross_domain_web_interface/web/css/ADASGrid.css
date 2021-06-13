@@ -1,0 +1,28 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  background-color: #FFFFFF;
+  padding: 10px;
+}
+.sub-grid-container-cols {
+  display: grid;
+  grid-template-columns: auto;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+.sub-grid-container-rows {
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto auto auto auto auto;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
+.grid-item {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  font-size: 30px;
+  text-align: center;
+}
