@@ -1,4 +1,5 @@
 <launch>
+    <!--Define default arguments -->
     <arg name="use_base" default="true"/>
     <arg name="use_arm" default="true"/>
     <arg name="use_sim" default="false"/>
@@ -7,6 +8,7 @@
     <arg name="use_rviz" default="true"/>
     <arg name="use_vslam" default="false"/>
 
+    <!--start main locobot control launch file -->
     <include file="$(find locobot_control)/launch/main.launch">
         <arg name="use_base" value="$(arg use_base)"/>
         <arg name="use_arm" value="$(arg use_arm)"/>
@@ -16,8 +18,10 @@
         <arg name="use_vslam" value="$(arg use_vslam)"/>
     </include>
 
+    <!-- start LiDAR ROS driver -->
     <include file="$(find ydlidar_ros_driver)/launch/G2.launch"/>
 
+    <!-- start required ROS nodes -->
     <node name="video_server" pkg="web_video_server" type="web_video_server" />
     <node name="ros_to_flask_bridge" pkg="flask_bridge" type="ros_flask_bridge.py" />
     <node name="locobot_gui_ctrl" pkg="tn_locobot_control" type="locobot_gui_control.py" output="screen" args="$(arg use_laser)"/>
