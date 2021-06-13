@@ -41,7 +41,8 @@ EXECUTION_TIME = 0.015
 min_z = 0.1
 max_z = 0.45
 
-pubTest = rospy.Publisher('chatter', PointStamped, queue_size=10)
+# create publisher for test point
+pubTest = rospy.Publisher('testPoint', PointStamped, queue_size=10)
 
 def homeArmService(req):
     """
@@ -88,7 +89,7 @@ def PointAndClickService(req):
     print(pt)
 
     # try to move to point
-    robot.base.go_to_relative([pt[0][0], pt[0][1], 0.0], use_map=True, smooth=False, close_loop=True)
+    robot.base.go_to_relative([pt[0][0], pt[0][1], 0.0], use_map=False, smooth=False, close_loop=True)
 
     return pointAndClickResponse(True)
 
