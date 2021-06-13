@@ -16,6 +16,8 @@
         <arg name="use_vslam" value="$(arg use_vslam)"/>
     </include>
 
+    <include file="$(find ydlidar_ros_driver)/launch/G2.launch"/>
+
     <node name="video_server" pkg="web_video_server" type="web_video_server" />
     <node name="ros_to_flask_bridge" pkg="flask_bridge" type="ros_flask_bridge.py" />
     <node name="locobot_gui_ctrl" pkg="tn_locobot_control" type="locobot_gui_control.py" output="screen" args="$(arg use_laser)"/>
