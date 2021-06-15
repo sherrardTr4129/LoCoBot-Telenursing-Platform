@@ -10,7 +10,7 @@ import threading
 import copy
 import requests
 import argparse
-from json import dumps
+from json import dumps, loads
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from FrontEndStateClass import FrontEndState
@@ -55,7 +55,9 @@ def getLidarData():
 
     # extract data
     LiDAR_data = request.get_json()
-    LiDAR_state = LiDAR_data['lidar_list']
+    LiDAR_state = loads(LiDAR_data)
+
+    return "OK"
 
 @app.route('/setFwdRev', methods=['POST'])
 def setFwdRev():
