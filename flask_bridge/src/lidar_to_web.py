@@ -9,6 +9,8 @@
 #          to the web-backend for display within the web-interface.
 
 import rospy
+import json
+import requests
 import collections
 from sensor_msgs.msg import LaserScan
 
@@ -18,6 +20,8 @@ laserscan_topic = "/scan"
 # define constants based on web interface
 NUM_DIRECTIONS = 4
 NUM_INDICATORS_PER_DIRECTION = 10
+interface_URL = "www.robotcontrol.live:12345"
+lidar_endpoint = "/getLiDARdata"
 
 # define LiDAR constants (intrinsic to sensor)
 angle_inc = 0.0124666374177
@@ -35,6 +39,14 @@ last_threshed = []
 # define thresholds for color vals
 MED_THRESH = 0.8
 CLOSE_THRESH = 0.4
+
+def send_lidar_data(lidar_list):
+    # jsonify list
+    list_str = json.dumps(lidar_list)
+
+    # make post req
+    interface_URL = interface_URL + lidar_endpoint
+    requests.post(interface_URL, json=list_str)
 
 def proc_scan(msg):
     # reference globals
@@ -103,7 +115,7 @@ def proc_scan(msg):
 
     # only send data if list has changed since last scan
     if(collections.Counter(threshed_chunks) != collections.Counter(last_threshed)):
-        print(threshed_chunks)
+        send_lidar_data(threshed_chunks)
 
     # update last threshed values list
     last_threshed = threshed_chunks
