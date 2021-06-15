@@ -20,7 +20,7 @@ laserscan_topic = "/scan"
 # define constants based on web interface
 NUM_DIRECTIONS = 4
 NUM_INDICATORS_PER_DIRECTION = 10
-interface_URL = "www.robotcontrol.live:12345"
+interface_URL = "http://165.227.213.213:5000"
 lidar_endpoint = "/getLiDARdata"
 
 # define LiDAR constants (intrinsic to sensor)
@@ -45,8 +45,8 @@ def send_lidar_data(lidar_list):
     list_str = json.dumps(lidar_list)
 
     # make post req
-    interface_URL = interface_URL + lidar_endpoint
-    requests.post(interface_URL, json=list_str)
+    total_interface_URL = interface_URL + lidar_endpoint
+    requests.post(total_interface_URL, json=list_str)
 
 def proc_scan(msg):
     # reference globals
