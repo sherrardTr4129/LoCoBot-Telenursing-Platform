@@ -12,6 +12,7 @@ import rospy
 import json
 import requests
 import collections
+import time
 from sensor_msgs.msg import LaserScan
 
 # define topic name
@@ -36,9 +37,14 @@ chuncked_angles = []
 global last_threshed
 last_threshed = []
 
+# define variables needed for rate limiting
+global last_time
+last_time = 0
+
 # define thresholds for color vals
 MED_THRESH = 0.8
 CLOSE_THRESH = 0.4
+REFRESH_TIME = 0.5 # 500 ms
 
 def send_lidar_data(lidar_list):
     # jsonify list
@@ -51,6 +57,7 @@ def send_lidar_data(lidar_list):
 def proc_scan(msg):
     # reference globals
     global last_threshed
+    global last_time
 
     # divide recieved scans into 40 chunks of concurrent scans
     list_index = 0
@@ -115,7 +122,11 @@ def proc_scan(msg):
 
     # only send data if list has changed since last scan
     if(collections.Counter(threshed_chunks) != collections.Counter(last_threshed)):
-        send_lidar_data(threshed_chunks)
+        # only send data if 500ms have elapsed since last send
+        now = time.time()
+        if(now - last_time > REFRESH_TIME):
+            send_lidar_data(threshed_chunks)
+            last_time = time.time()
 
     # update last threshed values list
     last_threshed = threshed_chunks
