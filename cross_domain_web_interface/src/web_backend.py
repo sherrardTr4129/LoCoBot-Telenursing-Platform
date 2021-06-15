@@ -23,8 +23,10 @@ CORS(app)
 global FE_State
 global prev_FE_State
 global RobotURL
+global LiDAR_state
 FE_State = FrontEndState()
 prev_FE_State = FrontEndState()
+LiDAR_state = []
 
 # declare URL of Robot
 robotEndpoint = "/updateRobotState"
@@ -38,6 +40,24 @@ RobotURL = ""
 DELAY = 0.3
 MAX_ZERO_COUNT = 3
 
+@app.route('/getLiDARdata', methods=['GET'])
+def getLidarData():
+    """
+    this function exposes the aquired (and downsampled) lidar representation
+    to the web frontend.
+
+    params:
+        None
+    returns:
+        lidar_json (str): JSON representation of the lidar data
+    """
+    # reference globals
+    global LiDAR_state
+
+    # make JSON string
+    lidar_json = dumps(LiDAR_state)
+
+    return lidar_json
 
 @app.route('/setLiDARdata', methods=['POST'])
 def setLidarData():
