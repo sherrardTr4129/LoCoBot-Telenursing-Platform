@@ -24,7 +24,6 @@ function set_colors()
 				else if(data[i] == 1){color = "yellow";}
 				else if(data[i] == 2){color = "red";}
 				set_div_color(i + 1, color);
-				console.log(i, color, data[i]);
 			}
 		},
                 contentType: "application/json",
