@@ -38,8 +38,9 @@ RobotURL = ""
 DELAY = 0.3
 MAX_ZERO_COUNT = 3
 
-@app.route('/getLiDARdata', methods=['POST'])
-def getLidarData():
+
+@app.route('/setLiDARdata', methods=['POST'])
+def setLidarData():
     """
     this function recieves the LiDAR data from the robot control software
     and updates a global state representation of said data. This global state
