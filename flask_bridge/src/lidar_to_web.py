@@ -21,7 +21,7 @@ laserscan_topic = "/scan"
 NUM_DIRECTIONS = 4
 NUM_INDICATORS_PER_DIRECTION = 10
 interface_URL = "http://165.227.213.213:5000"
-lidar_endpoint = "/getLiDARdata"
+lidar_endpoint = "/setLiDARdata"
 
 # define LiDAR constants (intrinsic to sensor)
 angle_inc = 0.0124666374177
