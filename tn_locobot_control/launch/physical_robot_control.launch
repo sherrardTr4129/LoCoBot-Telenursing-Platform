@@ -24,6 +24,6 @@
     <!-- start required ROS nodes -->
     <node name="video_server" pkg="web_video_server" type="web_video_server" />
     <node name="ros_to_flask_bridge" pkg="flask_bridge" type="ros_flask_bridge.py" />
+    <node name="lidar_to_web" pkg="flask_bridge" type="lidar_to_web.py" />
     <node name="locobot_gui_ctrl" pkg="tn_locobot_control" type="locobot_gui_control.py" output="screen" args="$(arg use_laser)"/>
-
 </launch>

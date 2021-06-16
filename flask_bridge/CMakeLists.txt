@@ -159,6 +159,7 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
  catkin_install_python(PROGRAMS
    src/ros_flask_bridge.py
+   src/lidar_to_web.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
  )
 
