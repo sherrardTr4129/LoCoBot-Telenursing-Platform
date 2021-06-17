@@ -4,6 +4,14 @@
  * Since: June 15th, 2021
  */
 
+/* set color of div based on div_id
+   params:
+      div_id (int) digit between 1-40.
+      color (string) color value to set the div to.
+
+   returns:
+      None
+*/
 function set_div_color(div_id, color)
 {
 	var elem_id = "d_" + div_id;
@@ -11,6 +19,15 @@ function set_div_color(div_id, color)
         element_ref.style.backgroundColor = color;
 }
 
+/* update the color of each of the individual scan 'bins'
+   based on down-sampled data from the lidar. This function will
+   run on a fixed interval of 250 ms. 
+
+   params:
+      None
+   returns:
+      None
+*/
 function set_colors()
 {
 	const url = "http://robotcontrol.live:5000/getLiDARdata";
