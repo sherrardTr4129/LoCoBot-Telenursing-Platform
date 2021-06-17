@@ -6,7 +6,11 @@ import numpy as np
 from geometry_msgs.msg import Twist, PointStamped
 from tn_locobot_control.srv import pointAndClick, pointAndClickResponse
 
+# define globals
 pointAndClickServiceName = "PointAndClickSrv"
+
+# create publisher for test point
+pubTest = rospy.Publisher('testPoint', PointStamped, queue_size=10)
 
 def PointAndClickService(req):
     """
@@ -24,13 +28,13 @@ def PointAndClickService(req):
     pt, color = robot.camera.pix_to_3dpt(req.row, req.col)
 
     # publish point for rviz visualization
-    #testPt = PointStamped()
-    #testPt.point.x = pt[0][0]
-    #testPt.point.y = pt[0][1]
-    #testPt.point.z = pt[0][2]
-    #testPt.header.stamp = rospy.Time.now()
-    #testPt.header.frame_id = "base_link"
-    #pubTest.publish(testPt)
+    testPt = PointStamped()
+    testPt.point.x = pt[0][0]
+    testPt.point.y = pt[0][1]
+    testPt.point.z = pt[0][2]
+    testPt.header.stamp = rospy.Time.now()
+    testPt.header.frame_id = "base_link"
+    pubTest.publish(testPt)
 
     # print recieved point
     rospy.loginfo('got point %s' % pt)
