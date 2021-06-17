@@ -31,4 +31,4 @@ function set_colors()
         });
 }
 
-setInterval(function(){ set_colors() }, 500);
+setInterval(function(){ set_colors() }, 250);
