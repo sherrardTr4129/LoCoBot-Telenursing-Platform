@@ -8,7 +8,6 @@ from geometry_msgs.msg import Twist, PointStamped
 from std_msgs.msg import Float32MultiArray, Int8
 from tn_locobot_control.srv import homeCamera, homeCameraResponse
 from tn_locobot_control.srv import homeArm, homeArmResponse
-from tn_locobot_control.srv import pointAndClick, pointAndClickResponse
 
 # define misc variables
 namespace = "/pyRobot_web_data/"
@@ -18,7 +17,6 @@ panTiltOffsetTopic = "pan_tilt_offset"
 xyzArmOffsetTopic = "xyz_arm_offet"
 homeCameraServiceName = "homeCameraSrv"
 homeArmServiceName = "homeArmSrv"
-pointAndClickServiceName = "PointAndClickSrv"
 
 # define scaling constants
 # ------------------------
@@ -60,38 +58,6 @@ def homeArmService(req):
 
     # return status
     return homeArmResponse(True)
-
-def PointAndClickService(req):
-    """
-    This function serves as the service callback to extract real-world
-    coordinates from data obtained from user point and click interface
-
-    params:
-	req(pointAndClick instance): the pointAndClick request
-    returns:
-        response (pointAndClickResponse instance): the service result
-    """
-    global robot
-
-    # get real world points in robot base frame
-    pt, color = robot.camera.pix_to_3dpt(req.row, req.col)
-
-    # publish point for rviz visualization
-    testPt = PointStamped()
-    testPt.point.x = pt[0][0]
-    testPt.point.y = pt[0][1]
-    testPt.point.z = pt[0][2]
-    testPt.header.stamp = rospy.Time.now()
-    testPt.header.frame_id = "base_link"
-    pubTest.publish(testPt)
-
-    # print recieved point
-    print(pt)
-
-    # try to move to point
-    robot.base.go_to_relative([pt[0][0], pt[0][1], 0.0], use_map=False, smooth=False, close_loop=True)
-
-    return pointAndClickResponse(True)
 
 def homeCameraService(req):
     """
@@ -258,7 +224,6 @@ def main(laser):
         # initialize services
         homeCameraServ = rospy.Service(homeCameraServiceName, homeCamera, homeCameraService)
         homeArmServ = rospy.Service(homeArmServiceName, homeArm, homeArmService)
-        pointAndClickSrv = rospy.Service(pointAndClickServiceName, pointAndClick, PointAndClickService)
 
         # Initialize subscriber to respond to joystick inputs
         rospy.Subscriber(modTwistTopic, Twist, twistCallback)

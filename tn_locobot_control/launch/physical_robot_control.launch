@@ -26,4 +26,5 @@
     <node name="ros_to_flask_bridge" pkg="flask_bridge" type="ros_flask_bridge.py" />
     <node name="lidar_to_web" pkg="flask_bridge" type="lidar_to_web.py" />
     <node name="locobot_gui_ctrl" pkg="tn_locobot_control" type="locobot_gui_control.py" output="screen" args="$(arg use_laser)"/>
+    <node name="point_and_click_stream_ctrl" pkg="tn_locobot_control" type="point_and_click_stream_control.py" output="screen"/>
 </launch>
