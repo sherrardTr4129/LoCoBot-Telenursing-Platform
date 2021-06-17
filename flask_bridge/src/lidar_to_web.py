@@ -44,7 +44,7 @@ last_time = 0
 # define thresholds for color vals
 MED_THRESH = 0.8
 CLOSE_THRESH = 0.4
-REFRESH_TIME = 0.5 # 500 ms
+REFRESH_TIME = 0.25 # 250 ms
 
 def send_lidar_data(lidar_list):
     # jsonify list
