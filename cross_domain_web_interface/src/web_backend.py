@@ -302,6 +302,7 @@ def sendCamSelection():
 
     # make request to robot
     statusString = requests.post(camCoordinateURL, json=cameraCoordinateDict)
+    rospy.loginfo(statusString)
 
     return "OK"
 

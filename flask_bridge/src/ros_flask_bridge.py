@@ -111,7 +111,7 @@ def camCoordinates():
     except rospy.ServiceException as error:
         rospy.logerr('point and click service error failed: %s' % error)
     
-    return "OK"    
+    return str(response)
 
 @app.route('/updateRobotState', methods=['POST'])
 def updateRobotStateCB():
