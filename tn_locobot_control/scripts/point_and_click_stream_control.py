@@ -9,6 +9,7 @@ from tn_locobot_control.srv import pointAndClick, pointAndClickResponse
 # define globals
 pointAndClickServiceName = "PointAndClickSrv"
 testPtTopic = "/testPoint"
+FLOOR_THRESH = 0.21
 
 # create publisher for test point
 pubTest = rospy.Publisher('testPtTopic', PointStamped, queue_size=10)
@@ -114,7 +115,7 @@ def PointAndClickService(req):
     frame = robot.camera.get_rgb()
 
     # verify point is on floor
-    isOnFloor = isPointOnFloor((req.row, req.col), frame)
+    isOnFloor = isPointOnFloor((req.row, req.col), frame, FLOOR_THRESH)
 
     if(isOnFloor):
         # get real world points in robot base frame
