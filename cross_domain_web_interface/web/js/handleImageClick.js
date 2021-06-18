@@ -23,7 +23,15 @@ function sendPointData(x, y)
     $.ajax({type: 'POST',
 	url: imagePointURL,
 	data: JSON.stringify (imagePointData),
-	success: function(data) {  },
+	success: function(data) {
+		if(data.success == true){
+			setTimeout(function() { alert('selected point is on floor! Moving to location...'); }, 1);
+		}
+		else{
+			alert('selected point is not safe! Please try again!');
+		}
+
+	},
 	contentType: "application/json",
 	dataType: 'json'
     });

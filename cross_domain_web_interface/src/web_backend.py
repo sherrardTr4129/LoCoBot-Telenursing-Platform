@@ -288,7 +288,7 @@ def sendCamSelection():
     params:
         None
     returns:
-        None
+        status (String)
     """
 
     global robotHostname
@@ -302,9 +302,13 @@ def sendCamSelection():
 
     # make request to robot
     statusString = requests.post(camCoordinateURL, json=cameraCoordinateDict)
-    rospy.loginfo(statusString)
 
-    return "OK"
+    # return result to front-end
+    result = statusString.text.split(':')[-1].strip()
+    if(result == 'True'):
+        return jsonify(success=True)
+    else:
+        return jsonify(success=False)
 
 def jsonifyObj(FEObj):
     """
