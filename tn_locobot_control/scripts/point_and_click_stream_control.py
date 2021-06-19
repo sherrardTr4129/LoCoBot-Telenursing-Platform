@@ -9,7 +9,7 @@ from tn_locobot_control.srv import pointAndClick, pointAndClickResponse
 # define globals
 pointAndClickServiceName = "PointAndClickSrv"
 testPtTopic = "/testPoint"
-FLOOR_THRESH = 0.21
+FLOOR_THRESH = 0.23
 
 # create publisher for test point
 pubTest = rospy.Publisher('testPtTopic', PointStamped, queue_size=10)
