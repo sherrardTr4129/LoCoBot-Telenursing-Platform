@@ -12,7 +12,7 @@ testPtTopic = "/testPoint"
 FLOOR_THRESH = 0.23
 
 # create publisher for test point
-pubTest = rospy.Publisher('testPtTopic', PointStamped, queue_size=10)
+pubTest = rospy.Publisher(testPtTopic, PointStamped, queue_size=10)
 
 def gen_random_pt(UL, BR, num_samples):
     """
@@ -127,7 +127,7 @@ def PointAndClickService(req):
         testPt.point.y = pt[0][1]
         testPt.point.z = pt[0][2]
         testPt.header.stamp = rospy.Time.now()
-        testPt.header.frame_id = "base_link"
+        testPt.header.frame_id = "map"
         pubTest.publish(testPt)
 
         # print recieved point
