@@ -14,7 +14,7 @@ import requests
 import collections
 import time
 from sensor_msgs.msg import LaserScan
-from setLidarThresh.srv import setLidarThresh, setLidarThreshResponse
+from flask_bridge.srv import setLidarThresh, setLidarThreshResponse
 
 # define topic name
 laserscan_topic = "/scan"

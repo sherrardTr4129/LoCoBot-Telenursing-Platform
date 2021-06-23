@@ -16,7 +16,7 @@ from std_msgs.msg import Float32MultiArray, Int8
 from tn_locobot_control.srv import homeCamera, homeCameraResponse
 from tn_locobot_control.srv import homeArm, homeArmResponse
 from tn_locobot_control.srv import pointAndClick, pointAndClickResponse
-from setLidarThresh.srv import setLidarThresh, setLidarThreshResponse
+from flask_bridge.srv import setLidarThresh, setLidarThreshResponse
 
 # initialize flask
 app = Flask(__name__)
@@ -135,8 +135,12 @@ def setThreshVals():
 
     # make ROS service call
     try:
-        serv_client = rospy.ServiceProxy(setLidarThreshSrvName, )
+        serv_client = rospy.ServiceProxy(setLidarThreshSrvName, setLidarThresh)
+        response = serv_client(close_val, very_close_val)
+    except rospy.ServiceException as error:
+        rospy.logerr('set lidar threshold service failed: %s', error)
 
+    return str(response)
 
 @app.route('/updateRobotState', methods=['POST'])
 def updateRobotStateCB():
