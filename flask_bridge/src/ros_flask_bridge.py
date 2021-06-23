@@ -37,7 +37,7 @@ xyzArmOffsetRopic = "xyz_arm_offet"
 homeCameraServiceName = "homeCameraSrv"
 homeArmServiceName = "homeArmSrv"
 pointAndClickServiceName = "PointAndClickSrv"
-setLidarThreshSrvName = 'set_lidar_thresh_vals'
+setLidarThreshSrvName = 'setLidarThreshVals'
 
 @app.route('/homeCamera', methods=['GET'])
 def homeCameraCB():
@@ -126,15 +126,16 @@ def setThreshVals():
     returns:
         response (str): the result of the ROS service call
     """
-    tresh_vals = request.json
-    close_val = thresh_vals['close']
-    very_close_val = tresh_vals['very_close']
+    thresh_vals = request.json
+    close_val = float(thresh_vals['close'])
+    very_close_val = float(thresh_vals['very_close'])
+    rospy.loginfo("close_val: " + str(close_val) + " ," + "very_close_val: " + str(very_close_val))
 
     # wait for service to come up
     rospy.wait_for_service(setLidarThreshSrvName)
 
     # make ROS service call
-    try:
+    try: 
         serv_client = rospy.ServiceProxy(setLidarThreshSrvName, setLidarThresh)
         response = serv_client(close_val, very_close_val)
     except rospy.ServiceException as error:

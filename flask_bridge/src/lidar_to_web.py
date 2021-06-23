@@ -20,7 +20,7 @@ from flask_bridge.srv import setLidarThresh, setLidarThreshResponse
 laserscan_topic = "/scan"
 
 # define service name
-setLidarThresh_name = "/set_lidar_thresh_vals"
+setLidarThresh_name = "setLidarThreshVals"
 
 # define constants based on web interface
 NUM_DIRECTIONS = 4
@@ -46,6 +46,8 @@ global last_time
 last_time = 0
 
 # define thresholds for color vals
+global MED_THRESH
+global CLOSE_THRESH
 MED_THRESH = 0.8
 CLOSE_THRESH = 0.4
 REFRESH_TIME = 0.25 # 250 ms
@@ -62,6 +64,10 @@ def update_lidar_tresh_service(req):
         setLidarThreshResponse (setLidarThreshResponse instance):
                                 ROS service response
     """
+    # reference globals
+    global MED_THRESH
+    global CLOSE_THRESH
+
     # unpack request data
     close_thresh = req.close_tresh
     very_close_thresh = req.very_close_thresh
@@ -69,6 +75,9 @@ def update_lidar_tresh_service(req):
     # update globals
     MED_THRESH = close_thresh
     CLOSE_THRESH = very_close_thresh
+
+    # inform system of update
+    rospy.loginfo('lidar threshold values updated!')
 
     return setLidarThreshResponse(True)
 
@@ -84,6 +93,8 @@ def proc_scan(msg):
     # reference globals
     global last_threshed
     global last_time
+    global CLOSE_THRESH
+    global MED_THRESH
 
     # divide recieved scans into 40 chunks of concurrent scans
     list_index = 0
