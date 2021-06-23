@@ -13,6 +13,7 @@ import json
 import requests
 import collections
 import time
+from WindowedAverage import MovingWindowAverage
 from sensor_msgs.msg import LaserScan
 from flask_bridge.srv import setLidarThresh, setLidarThreshResponse
 
@@ -51,6 +52,11 @@ global CLOSE_THRESH
 MED_THRESH = 0.8
 CLOSE_THRESH = 0.4
 REFRESH_TIME = 0.25 # 250 ms
+
+# init list of moving average objects for lidar smoothing
+global MovingAverageList
+MovingAverageList = []
+WINDOW_SIZE = 6
 
 def update_lidar_tresh_service(req):
     """
@@ -139,23 +145,28 @@ def proc_scan(msg):
         current_angle += angle_inc
         total_count += 1
 
-
     # average each chunk and threshold the average into one of three levels
     # (close = 2, medium = 1, far = 0)
     for chunk in total_point_chunks:
-        cur_val = 0
+        count = 0
 
         # compute chunk avg
         chunk_avg = sum(chunk) / len(chunk)
 
-        # check if chunk avg is within threshold
-        if(chunk_avg < MED_THRESH and chunk_avg > CLOSE_THRESH):
+        # append thresholded value to moving averager
+        res = MovingAverageList[count].addAndProc(chunk_avg)
+
+        # threshold averaged value 
+        cur_val = 0
+        if(res < MED_THRESH and res > CLOSE_THRESH):
             cur_val = 1
-        elif(chunk_avg < CLOSE_THRESH):
+        elif(res < CLOSE_THRESH):
             cur_val = 2
 
-        # append thresholded value
         threshed_chunks.append(cur_val)
+
+        # increment count
+        count += 1
 
     # only send data if list has changed since last scan
     if(collections.Counter(threshed_chunks) != collections.Counter(last_threshed)):
@@ -183,6 +194,11 @@ def main():
     total_angle_inc = total_angle / (NUM_DIRECTIONS * NUM_INDICATORS_PER_DIRECTION)
     for i in range(1, (NUM_DIRECTIONS * NUM_INDICATORS_PER_DIRECTION) + 1):
         chuncked_angles.append(angle_min + total_angle_inc * i)
+
+    # init moving average object list
+    for i in range(NUM_DIRECTIONS * NUM_INDICATORS_PER_DIRECTION):
+        newAvg = MovingWindowAverage(WINDOW_SIZE)
+        MovingAverageList.append(newAvg)
 
     rospy.spin()
 
