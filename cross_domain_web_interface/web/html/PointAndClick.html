@@ -11,6 +11,7 @@
   <script src="../js/joy.js"></script>
   <script src="../js/handleImageClick.js"></script>
   <script src="../js/handleStream.js"></script>
+  <script src="../js/handleLidarThresh.js"></script>
 </head>
 
 <body onload="setImgStream()">
@@ -92,4 +93,20 @@
 		<script src="../js/divColorControl.js"></script>
 		<script src="../js/joyReaderPandC.js"></script>
 	</section>
+
+	<!-- set threshold for distance of LiDAR sensor-->
+	<section class="columns">
+                <div class="column" align="center">
+                        <h2>LiDAR Distance Color Threshold</h2>
+			<h4>Please Set Threshold for 'Close' and 'Very Close' LiDAR scan results for use in above interface. </h4>
+
+			<label for="tentacles">Value For 'Close' Threshold (meters):</label>
+			<input type="number" id="close_thresh" name="close_thresh" step="0.05" min="0.3" max="5" value="0.8"></input> <br><br>
+
+			<label for="tentacles">Value For 'Very Close' Threshold (meters):</label>
+			<input type="number" id="very_close_thresh" name="very_close_thresh" step="0.05" min="0.1" max="2" value="0.3"></input> <br><br>
+
+			<button type="button" onclick="get_thresh_vals()">Set Threshold Values</button> <br><br>
+                </div>
+        </section>
 </body>
