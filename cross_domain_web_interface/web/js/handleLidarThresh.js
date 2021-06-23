@@ -10,7 +10,7 @@ var threshData = {
     "very_close":0
 };
 
-function sendPointData(close_thresh, very_close_thresh)
+function sendTreshData(close_thresh, very_close_thresh)
 {
     // construct data packet
     threshData.close = close_thresh;
@@ -42,6 +42,7 @@ function get_thresh_vals(){
     
     // if input looks good, go ahead and make request to backend to update values
     else{
-        sendPointData(close_thresh_value, very_close_thresh_val);
+        sendTreshData(close_thresh_value, very_close_thresh_val);
+	console.log("set close_thresh_value: " + close_thresh_value + " ," + very_close_thresh_val);
     }
 }

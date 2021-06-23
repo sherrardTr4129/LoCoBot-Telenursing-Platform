@@ -7,11 +7,11 @@
  */
 
 // set up data prototypes for sending P&C locations
-var imagePointURL = "http://robotcontrol.live:5000/sendCamSelection"
+var imagePointURL = "http://robotcontrol.live:5000/sendCamSelection";
 var imagePointData = {
     "imgX":0,
     "imgY":0
-}
+};
 
 function sendPointData(x, y)
 {
