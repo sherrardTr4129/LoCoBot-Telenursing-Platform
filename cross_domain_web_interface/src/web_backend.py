@@ -33,6 +33,7 @@ robotEndpoint = "/updateRobotState"
 homeCameraEndpoint = "/homeCamera"
 homeArmEndpoint = "/homeArm"
 camEndpoint = "/camCoordinates"
+threshEndpoint = "/setThreshVals"
 robotHostname = ""
 RobotURL = ""
 
@@ -295,7 +296,6 @@ def sendCamSelection():
 
     # extract data from request
     cameraCoordinateDict = request.get_json()
-    print(cameraCoordinateDict)
 
     # make URL
     camCoordinateURL = robotHostname + camEndpoint
@@ -309,6 +309,34 @@ def sendCamSelection():
         return jsonify(success=True)
     else:
         return jsonify(success=False)
+
+@app.route('/sendThreshVal', methods=['POST'])
+def sendThreshVals():
+    """
+    This function takes the user selected threshold
+    values for the lidar color values within the web interface
+    and transmits this data to the backend and through the ros
+    flask bridge to the robot. 
+
+    params:
+        None
+    returns:
+        Status (string)
+    """
+
+    global robotHostname
+
+    # extract data from requst
+    thresh_dict = request.get_json()
+
+    # make URL request string
+    set_thresh_URL = robotHostname + threshEndpoint
+
+    # make request to robot
+    statusString = requests.post(set_thresh_URL, json=thresh_dict)
+
+    return "OK"
+
 
 def jsonifyObj(FEObj):
     """

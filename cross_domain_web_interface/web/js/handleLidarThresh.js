@@ -4,6 +4,28 @@
  * Since: June 22nd, 2021
  */
 
+var setThreshURL = "http://robotcontrol.live:5000/sendThreshVal";
+var threshData = {
+    "close":0,
+    "very_close":0
+};
+
+function sendPointData(close_thresh, very_close_thresh)
+{
+    // construct data packet
+    threshData.close = close_thresh;
+    threshData.very_close = very_close_thresh;
+
+    // make POST request
+    $.ajax({type: 'POST',
+	url: setThreshURL,
+	data: JSON.stringify (threshData),
+	success: function(data) {console.log('data');},
+	contentType: "application/json",
+	dataType: 'json'
+    });
+}
+
 function get_thresh_vals(){
     // get input references
     var close_thresh_input = document.getElementById('close_thresh');
@@ -20,6 +42,6 @@ function get_thresh_vals(){
     
     // if input looks good, go ahead and make request to backend to update values
     else{
-        alert('I am a Stub!');
+        sendPointData(close_thresh_value, very_close_thresh_val);
     }
 }

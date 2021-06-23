@@ -14,9 +14,13 @@ import requests
 import collections
 import time
 from sensor_msgs.msg import LaserScan
+from setLidarThresh.srv import setLidarThresh, setLidarThreshResponse
 
 # define topic name
 laserscan_topic = "/scan"
+
+# define service name
+setLidarThresh_name = "/set_lidar_thresh_vals"
 
 # define constants based on web interface
 NUM_DIRECTIONS = 4
@@ -45,6 +49,28 @@ last_time = 0
 MED_THRESH = 0.8
 CLOSE_THRESH = 0.4
 REFRESH_TIME = 0.25 # 250 ms
+
+def update_lidar_tresh_service(req):
+    """
+    this function serves as the ROS service to unpack data recieved 
+    from the web backend through the ROS Flask bridge and 
+    set global variables in this file to said values
+
+    params;
+        req (setLidarThresh instance): data sent to request
+    returns:
+        setLidarThreshResponse (setLidarThreshResponse instance):
+                                ROS service response
+    """
+    # unpack request data
+    close_thresh = req.close_tresh
+    very_close_thresh = req.very_close_thresh
+
+    # update globals
+    MED_THRESH = close_thresh
+    CLOSE_THRESH = very_close_thresh
+
+    return setLidarThreshResponse(True)
 
 def send_lidar_data(lidar_list):
     # jsonify list
@@ -137,6 +163,10 @@ def main():
 
     # start subscriber
     rospy.Subscriber(laserscan_topic, LaserScan, proc_scan)
+
+    # set up lidar threshold update service
+    rospy.Service(setLidarThresh_name, setLidarThresh, update_lidar_tresh_service)
+    rospy.loginfo('set LiDAR threshold service up! Ready for requests...')
 
     # init angle limits for chuncks
     total_angle_inc = total_angle / (NUM_DIRECTIONS * NUM_INDICATORS_PER_DIRECTION)

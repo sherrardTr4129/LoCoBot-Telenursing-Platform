@@ -16,6 +16,7 @@ from std_msgs.msg import Float32MultiArray, Int8
 from tn_locobot_control.srv import homeCamera, homeCameraResponse
 from tn_locobot_control.srv import homeArm, homeArmResponse
 from tn_locobot_control.srv import pointAndClick, pointAndClickResponse
+from setLidarThresh.srv import setLidarThresh, setLidarThreshResponse
 
 # initialize flask
 app = Flask(__name__)
@@ -36,6 +37,7 @@ xyzArmOffsetRopic = "xyz_arm_offet"
 homeCameraServiceName = "homeCameraSrv"
 homeArmServiceName = "homeArmSrv"
 pointAndClickServiceName = "PointAndClickSrv"
+setLidarThreshSrvName = 'set_lidar_thresh_vals'
 
 @app.route('/homeCamera', methods=['GET'])
 def homeCameraCB():
@@ -93,7 +95,7 @@ def camCoordinates():
     params:
         None
     returns:
-        None
+        response (str): the result of the ROS service call
     """
 
     # extract data from request
@@ -112,6 +114,29 @@ def camCoordinates():
         rospy.logerr('point and click service error failed: %s' % error)
     
     return str(response)
+
+@app.route('/setThreshVals', methods=['POST'])
+def setThreshVals():
+    """
+    this function serves as the designated bridge endpoint 
+    that is used to recieve threshold values for the ADAS-like interface.
+
+    params:
+        None
+    returns:
+        response (str): the result of the ROS service call
+    """
+    tresh_vals = request.json
+    close_val = thresh_vals['close']
+    very_close_val = tresh_vals['very_close']
+
+    # wait for service to come up
+    rospy.wait_for_service(setLidarThreshSrvName)
+
+    # make ROS service call
+    try:
+        serv_client = rospy.ServiceProxy(setLidarThreshSrvName, )
+
 
 @app.route('/updateRobotState', methods=['POST'])
 def updateRobotStateCB():

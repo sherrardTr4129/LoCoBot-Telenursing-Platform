@@ -1,0 +1,4 @@
+float32 close_tresh
+float32 very_close_thresh
+---
+bool status 
