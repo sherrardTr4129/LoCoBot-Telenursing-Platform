@@ -5,7 +5,7 @@ from KalmanFilter import KalmanFilter
 
 t = linspace(0, math.pi/5, 600)
 
-k = KalmanFilter(0.5, 0.5, 0.5)
+k = KalmanFilter(0.5, 0.5)
 
 test_array = []
 kalman_array = []

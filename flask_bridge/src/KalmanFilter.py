@@ -7,9 +7,9 @@
 
 class KalmanFilter:
     '''Kalman Filter Object Definition'''
-    def __init__(self, measurement_err, estimate_err, Q_val):
+    def __init__(self, measurement_err, Q_val):
         self.measurement_err = measurement_err
-        self.estimate_err = estimate_err
+        self.estimate_err = measurement_err
         self.Q_val = Q_val
         self.last_estimate = 0
         self.current_estimate = None
