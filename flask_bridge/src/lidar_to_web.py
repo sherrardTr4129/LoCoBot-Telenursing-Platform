@@ -14,6 +14,7 @@ import requests
 import collections
 import time
 from WindowedAverage import MovingWindowAverage
+from KalmanFilter import KalmanFilter
 from sensor_msgs.msg import LaserScan
 from flask_bridge.srv import setLidarThresh, setLidarThreshResponse
 
@@ -58,6 +59,16 @@ global MovingAverageList
 MovingAverageList = []
 WINDOW_SIZE = 6
 
+# init list of Kalman filtering object for lidar smoothing
+global KalmanSmoothingList
+KalmanSmoothingList = []
+measure_err = 0.75 # expected varience in averaged lidar data.
+process_varience = 0.5 # how fast does our measurment move?
+
+# set Smoothing Method here
+USING_WINDOW = False
+USING_KALMAN = True
+
 def update_lidar_tresh_service(req):
     """
     this function serves as the ROS service to unpack data recieved 
@@ -101,6 +112,8 @@ def proc_scan(msg):
     global last_time
     global CLOSE_THRESH
     global MED_THRESH
+    global MovingAverageList
+    global KalmanSmoothingList
 
     # divide recieved scans into 40 chunks of concurrent scans
     list_index = 0
@@ -153,15 +166,26 @@ def proc_scan(msg):
         # compute chunk avg
         chunk_avg = sum(chunk) / len(chunk)
 
-        # append thresholded value to moving averager
-        res = MovingAverageList[count].addAndProc(chunk_avg)
+        # perform smoothing
+        res = 0
+        if(USING_WINDOW):
+            # append thresholded value to moving averager
+            res = MovingAverageList[count].addAndProc(chunk_avg)
+        elif(USING_KALMAN):
+            res = KalmanSmoothingList[count].updateEstimate(chunk_avg)
 
         # threshold averaged value 
         cur_val = 0
         if(res < MED_THRESH and res > CLOSE_THRESH):
-            cur_val = 1
+            color_val = 1
+            diff = MED_THRESH - CLOSE_THRESH 
+            fade_value = (res - diff)/diff
+            cur_val = color_val + fade_value
+
         elif(res < CLOSE_THRESH):
-            cur_val = 2
+            color_val = 2
+            fade_value = res/CLOSE_THRESH
+            cur_val = color_val + fade_value
 
         threshed_chunks.append(cur_val)
 
@@ -180,6 +204,10 @@ def proc_scan(msg):
     last_threshed = threshed_chunks
 
 def main():
+    # init globals
+    global MovingAverageList
+    global KalmanSmoothingList
+
     rospy.init_node('lidar_to_web')
     rospy.loginfo('lidar_to_web node initialized!')
 
@@ -196,9 +224,15 @@ def main():
         chuncked_angles.append(angle_min + total_angle_inc * i)
 
     # init moving average object list
-    for i in range(NUM_DIRECTIONS * NUM_INDICATORS_PER_DIRECTION):
-        newAvg = MovingWindowAverage(WINDOW_SIZE)
-        MovingAverageList.append(newAvg)
+    if(USING_WINDOW):
+        for i in range(NUM_DIRECTIONS * NUM_INDICATORS_PER_DIRECTION):
+            newAvg = MovingWindowAverage(WINDOW_SIZE)
+            MovingAverageList.append(newAvg)
+
+    elif(USING_KALMAN):
+        for i in range(NUM_DIRECTIONS * NUM_INDICATORS_PER_DIRECTION):
+            newKalman = KalmanFilter(measure_err, process_varience)
+            KalmanSmoothingList.append(newKalman)
 
     rospy.spin()
 
