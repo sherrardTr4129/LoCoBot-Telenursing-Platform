@@ -38,8 +38,21 @@ function set_colors()
 			{
 				var color;
 				if(data[i] == 0){color = "white";}
-				else if(data[i] == 1){color = "yellow";}
-				else if(data[i] == 2){color = "red";}
+				else if(data[i] >= 1 && data[i] <= 2){
+					// get fade amount (0-255)
+					var fade_percent = data[i] - 1;
+					var fade_int = Math.round(255 * fade_percent);
+
+					// get hex string from number
+					var hex_string = fade_int.toString(16).toUpperCase();
+
+					// pad with zeros if needed
+					if(hex_string.length < 2){ hex_string = '0' + hex_string};
+					color = "FFFF" + hex_string;
+				}
+				else if(data[i] > 2){
+					color = "FF0000";
+				}
 				set_div_color(i + 1, color);
 			}
 		},
